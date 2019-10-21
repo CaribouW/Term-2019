@@ -65,7 +65,7 @@ int FAT::getFATValue(FILE *fat12, int num)   //NUM=开始簇号DIR_FstClus
 
 void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
     //数据区的第一个簇（即2号簇）的偏移字节
-    int dataBase = BytsPerSec * (RsvdSecCnt + FATSz * NumFATs + (RootEntCnt * 32 + BytsPerSec - 1) / BytsPerSec);
+    int dataBase = fetchDataBaseInByte();
     char fullName[24];  //存放文件路径及全名
     int strLength = strlen(directory);
     strcpy(fullName, directory);
@@ -108,9 +108,8 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
                 continue;
             }   //空条目不输出
             //过滤非目标文件
-            int j;
             int boolean = 0;
-            for (j = loop; j < loop + 11; j++) {
+            for (int j = loop; j < loop + 11; j++) {
                 if (!(((content[j] >= 48) && (content[j] <= 57)) ||
                       ((content[j] >= 65) && (content[j] <= 90)) ||
                       ((content[j] >= 97) && (content[j] <= 122)) ||
@@ -123,9 +122,8 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
                 loop += 32;
                 continue;
             }   //非目标文件不输出
-            int k;
             int tempLong = -1;
-            for (k = 0; k < 11; k++) {
+            for (int k = 0; k < 11; k++) {
                 if (content[loop + k] != ' ') {
                     tempLong++;
                     tempName[tempLong] = content[loop + k];
@@ -155,13 +153,12 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
 }
 
 void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
-    int base = (RsvdSecCnt + NumFATs * FATSz) * BytsPerSec; //根目录首字节的偏移数
+    int base = fetchRootDicBaseInByte(); //根目录首字节的偏移数
     int check;
     char realName[12];  //暂存将空格替换成点后的文件名
 
     //依次处理根目录中的各个条目
-    int i;
-    for (i = 0; i < RootEntCnt; i++) {
+    for (int i = 0; i < RootEntCnt; i++) {
 
         check = fseek(fat12, base, SEEK_SET);
         if (check == -1)
@@ -176,24 +173,22 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
         if (rootEntry_ptr->DIR_Name[0] == '\0') continue;     //空条目不输出
 
         //过滤非目标文件
-        int j;
         int boolean = 0;
-        for (j = 0; j < 11; j++) {
-            if (!(((rootEntry_ptr->DIR_Name[j] >= 48) && (rootEntry_ptr->DIR_Name[j] <= 57)) ||
-                  ((rootEntry_ptr->DIR_Name[j] >= 65) && (rootEntry_ptr->DIR_Name[j] <= 90)) ||
-                  ((rootEntry_ptr->DIR_Name[j] >= 97) && (rootEntry_ptr->DIR_Name[j] <= 122)) ||
-                  (rootEntry_ptr->DIR_Name[j] == ' '))) {
+        for (char ch : rootEntry_ptr->DIR_Name) {
+            if (!(((ch >= 48) && (ch <= 57)) ||
+                  ((ch >= 65) && (ch <= 90)) ||
+                  ((ch >= 97) && (ch <= 122)) ||
+                  (ch == ' '))) {
                 boolean = 1;    //非英文及数字、空格
                 break;
             }
         }
         if (boolean == 1) continue;  //非目标文件不输出
 
-        int k;
         if ((rootEntry_ptr->DIR_Attr & 0x10) == 0) {
             //文件
             int tempLong = -1;
-            for (k = 0; k < 11; k++) {
+            for (int k = 0; k < 11; k++) {
                 if (rootEntry_ptr->DIR_Name[k] != ' ') {
                     tempLong++;
                     realName[tempLong] = rootEntry_ptr->DIR_Name[k];
@@ -212,7 +207,7 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
         } else {
             //目录
             int tempLong = -1;
-            for (k = 0; k < 11; k++) {
+            for (int k = 0; k < 11; k++) {
                 if (rootEntry_ptr->DIR_Name[k] != ' ') {
                     tempLong++;
                     realName[tempLong] = rootEntry_ptr->DIR_Name[k];

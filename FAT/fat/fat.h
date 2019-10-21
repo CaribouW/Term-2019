@@ -47,6 +47,8 @@ struct RootEntry {
 
 class FAT {
 public:
+    FILE *fat12_ptr;
+    BPB *bpb_ptr;
     int BytsPerSec;     //每扇区字节数
     int SecPerClus;     //每簇扇区数
     int RsvdSecCnt;     //Boot记录占用的扇区数
@@ -58,6 +60,30 @@ public:
     int FileSize;//文件大小
     int NextCluser;
 
+    FAT() {}
+
+    FAT(char *str) {
+        FILE *pFile;
+        pFile = fopen("fat12.img", "rb");
+        this->fat12_ptr = pFile;
+        //set up BPB
+        BPB bpb{};
+        BPB *bpb_ptr = &bpb;
+        fillBPB(fat12_ptr, bpb_ptr);
+        this->bpb_ptr = bpb_ptr;
+    }
+
+    int getFATValue(int num) {
+        return getFATValue(this->fat12_ptr, num);
+    }
+
+    void printRootFiles() {
+        RootEntry rootEntry{}; //根目录
+        RootEntry *rootEntry_ptr = &rootEntry;
+        printFiles(this->fat12_ptr, rootEntry_ptr);
+    }
+
+private:
     void fillBPB(FILE *fat12, struct BPB *bpb_ptr);
 
     int getFATValue(FILE *fat12, int num);
@@ -65,4 +91,15 @@ public:
     void printChildren(FILE *fat12, char *directory, int startClus);
 
     void printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr);
+
+    int fetchRootDicBaseInByte() {
+        return (RsvdSecCnt + NumFATs * FATSz) * BytsPerSec;
+    }
+
+
+    int fetchDataBaseInByte() {
+        return BytsPerSec *
+               (RsvdSecCnt + FATSz * NumFATs +
+                (RootEntCnt * 32 + BytsPerSec - 1) / BytsPerSec);
+    }
 };

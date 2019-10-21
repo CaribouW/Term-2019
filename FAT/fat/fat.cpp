@@ -3,7 +3,12 @@
 //
 
 #include "fat.h"
+#include <cctype>
 
+//判定是否是有效字符 数字、字母、空格
+static bool isValidPath(const char ch) {
+    return isalnum(ch) || isblank(ch);
+}
 
 void FAT::fillBPB(FILE *fat12, struct BPB *bpb_ptr) {
     int32_t index;
@@ -28,7 +33,7 @@ void FAT::fillBPB(FILE *fat12, struct BPB *bpb_ptr) {
     FATSz = bpb_ptr->BPB_FATSz16;
 }
 
-int FAT::getFATValue(FILE *fat12, int num)   //NUM=开始簇号DIR_FstClus
+int FAT::getNextFatValue(FILE *fat12, int num)   //NUM=开始簇号DIR_FstClus
 {
     //FAT1的偏移字节
     int fatBase = RsvdSecCnt * BytsPerSec;
@@ -63,10 +68,12 @@ int FAT::getFATValue(FILE *fat12, int num)   //NUM=开始簇号DIR_FstClus
     }
 }
 
+
 void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
     //数据区的第一个簇（即2号簇）的偏移字节
     int dataBase = fetchDataBaseInByte();
-    char fullName[24];  //存放文件路径及全名
+    //存放文件路径及全名
+    char fullName[24];
     int strLength = strlen(directory);
     strcpy(fullName, directory);
     fullName[strLength] = '/';
@@ -77,59 +84,54 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
     int currentClus = startClus;
     int value = 0;//value為十六進制數，每次存儲2/4個字節
     int ifOnlyDirectory = 0;
+    //如果值大于或等于0xFF8，则表示当前簇已经是文件的最后一个簇了。如果值为0xFF7，表示它是一个坏簇
     while (value < 0xFF8) {
-        value = getFATValue(fat12, currentClus);
+        value = getNextFatValue(fat12, currentClus);
         if (value == 0xFF7) {
             printf("bad cluster!Reading fails!\n");
             break;
         }
-
-        char *str = (char *) malloc(SecPerClus * BytsPerSec); //暂存从簇中读出的数据
+        int byteInCluster = SecPerClus * BytsPerSec; //每簇的字节数
+        char *str = new char[byteInCluster]; //暂存从簇中读出的数据
         char *content = str;
 
-        int startByte = dataBase + (currentClus - 2) * SecPerClus * BytsPerSec;
+        //-2是因为两个Reserv
+        int startByte = dataBase + (currentClus - 2) * byteInCluster;
         int check;
         check = fseek(fat12, startByte, SEEK_SET);
         if (check == -1)
             printf("fseek in printChildren failed!");
 
-        check = fread(content, 1, SecPerClus * BytsPerSec, fat12);
-        if (check != SecPerClus * BytsPerSec)
+        check = fread(content, 1, byteInCluster, fat12);
+        if (check != byteInCluster)
             printf("fread in printChildren failed!");
 
         //解析content中的数据,依次处理各个条目,目录下每个条目结构与根目录下的目录结构相同
-        int count = SecPerClus * BytsPerSec; //每簇的字节数
         int loop = 0;
-        while (loop < count) {
-            int i;
+        while (loop < byteInCluster) {
             char tempName[12];  //暂存替换空格为点后的文件名
             if (content[loop] == '\0') {
                 loop += 32;
                 continue;
             }   //空条目不输出
             //过滤非目标文件
-            int boolean = 0;
+            int pathInvalid = 0;
             for (int j = loop; j < loop + 11; j++) {
-                if (!(((content[j] >= 48) && (content[j] <= 57)) ||
-                      ((content[j] >= 65) && (content[j] <= 90)) ||
-                      ((content[j] >= 97) && (content[j] <= 122)) ||
-                      (content[j] == ' '))) {
-                    boolean = 1;    //非英文及数字、空格
+                if (!isValidPath(content[j])) {
+                    pathInvalid = 1;    //非英文及数字、空格
                     break;
                 }
             }
-            if (boolean == 1) {
+            if (pathInvalid == 1) {
                 loop += 32;
                 continue;
             }   //非目标文件不输出
             int tempLong = -1;
             for (int k = 0; k < 11; k++) {
                 if (content[loop + k] != ' ') {
-                    tempLong++;
-                    tempName[tempLong] = content[loop + k];
+                    tempName[++tempLong] = content[loop + k];
                 } else {
-                    tempLong++;
-                    tempName[tempLong] = '.';
+                    tempName[++tempLong] = '.';
                     while (content[loop + k] == ' ') k++;
                     k--;
                 }
@@ -142,12 +144,10 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
             ifOnlyDirectory = 1;
             loop += 32;
         }
-
         free(str);
-
+        //
         currentClus = value;
-    };
-
+    }
     if (ifOnlyDirectory == 0)
         printf("%s\n", fullName);  //空目录的情况下，输出目录
 }
@@ -175,18 +175,14 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
         //过滤非目标文件
         int boolean = 0;
         for (char ch : rootEntry_ptr->DIR_Name) {
-            if (!(((ch >= 48) && (ch <= 57)) ||
-                  ((ch >= 65) && (ch <= 90)) ||
-                  ((ch >= 97) && (ch <= 122)) ||
-                  (ch == ' '))) {
+            if (!isValidPath(ch)) {
                 boolean = 1;    //非英文及数字、空格
                 break;
             }
         }
         if (boolean == 1) continue;  //非目标文件不输出
-
+        //文件
         if ((rootEntry_ptr->DIR_Attr & 0x10) == 0) {
-            //文件
             int tempLong = -1;
             for (int k = 0; k < 11; k++) {
                 if (rootEntry_ptr->DIR_Name[k] != ' ') {
@@ -207,10 +203,10 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
         } else {
             //目录
             int tempLong = -1;
-            for (int k = 0; k < 11; k++) {
-                if (rootEntry_ptr->DIR_Name[k] != ' ') {
+            for (char k : rootEntry_ptr->DIR_Name) {
+                if (k != ' ') {
                     tempLong++;
-                    realName[tempLong] = rootEntry_ptr->DIR_Name[k];
+                    realName[tempLong] = k;
                 } else {
                     tempLong++;
                     realName[tempLong] = '\0';

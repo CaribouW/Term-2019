@@ -64,7 +64,7 @@ public:
 
     FAT(char *str) {
         FILE *pFile;
-        pFile = fopen("fat12.img", "rb");
+        pFile = fopen(str, "rb");
         this->fat12_ptr = pFile;
         //set up BPB
         BPB bpb{};
@@ -74,7 +74,7 @@ public:
     }
 
     int getFATValue(int num) {
-        return getFATValue(this->fat12_ptr, num);
+        return getNextFatValue(this->fat12_ptr, num);
     }
 
     void printRootFiles() {
@@ -86,18 +86,31 @@ public:
 private:
     void fillBPB(FILE *fat12, struct BPB *bpb_ptr);
 
-    int getFATValue(FILE *fat12, int num);
+    /**
+     * 根据FAT表链表式的存储方式, 根据当前value (以sector为单位) 来获取下一个value (以sector为单位)
+     * */
+    int getNextFatValue(FILE *fat12, int num);
 
+    /**
+     * 输出目录下文件
+     * @param directory: 目录名称,仅仅是作为输出的时候的前缀
+     * @param startClus: 开始簇,作为链表形式进行输出
+     * */
     void printChildren(FILE *fat12, char *directory, int startClus);
 
     void printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr);
+
 
     int fetchRootDicBaseInByte() {
         return (RsvdSecCnt + NumFATs * FATSz) * BytsPerSec;
     }
 
-
+    /**
+     * 获取数据data区的起始位置
+     * 以byte为单位
+     * */
     int fetchDataBaseInByte() {
+        //之所以分子要加上(BPB_BytsPerSec-1)，是为了保证此公式在根目录区无法填满整数扇区时仍然成立
         return BytsPerSec *
                (RsvdSecCnt + FATSz * NumFATs +
                 (RootEntCnt * 32 + BytsPerSec - 1) / BytsPerSec);

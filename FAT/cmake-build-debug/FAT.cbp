@@ -80,6 +80,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/mac/Documents/repos/OS-2019/FAT/InstrEngine.cpp">
+			<Option target="FAT"/>
+		</Unit>
+		<Unit filename="/Users/mac/Documents/repos/OS-2019/FAT/InstrEngine.h">
+			<Option target="FAT"/>
+		</Unit>
 		<Unit filename="/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/dsa.cpp">
 			<Option target="FAT"/>
 		</Unit>

@@ -123,6 +123,33 @@ FAT/fast:
 	$(MAKE) -f CMakeFiles/FAT.dir/build.make CMakeFiles/FAT.dir/build
 .PHONY : FAT/fast
 
+InstrEngine.o: InstrEngine.cpp.o
+
+.PHONY : InstrEngine.o
+
+# target to build an object file
+InstrEngine.cpp.o:
+	$(MAKE) -f CMakeFiles/FAT.dir/build.make CMakeFiles/FAT.dir/InstrEngine.cpp.o
+.PHONY : InstrEngine.cpp.o
+
+InstrEngine.i: InstrEngine.cpp.i
+
+.PHONY : InstrEngine.i
+
+# target to preprocess a source file
+InstrEngine.cpp.i:
+	$(MAKE) -f CMakeFiles/FAT.dir/build.make CMakeFiles/FAT.dir/InstrEngine.cpp.i
+.PHONY : InstrEngine.cpp.i
+
+InstrEngine.s: InstrEngine.cpp.s
+
+.PHONY : InstrEngine.s
+
+# target to generate assembly for a file
+InstrEngine.cpp.s:
+	$(MAKE) -f CMakeFiles/FAT.dir/build.make CMakeFiles/FAT.dir/InstrEngine.cpp.s
+.PHONY : InstrEngine.cpp.s
+
 dsa.o: dsa.cpp.o
 
 .PHONY : dsa.o
@@ -186,6 +213,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... FAT"
+	@echo "... InstrEngine.o"
+	@echo "... InstrEngine.i"
+	@echo "... InstrEngine.s"
 	@echo "... dsa.o"
 	@echo "... dsa.i"
 	@echo "... dsa.s"

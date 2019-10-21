@@ -4,8 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/mac/Documents/repos/OS-2019/FAT/InstrEngine.cpp" "/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles/FAT.dir/InstrEngine.cpp.o"
   "/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/dsa.cpp" "/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles/FAT.dir/dsa.cpp.o"
+  "/Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.cpp" "/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o"
+  "/Users/mac/Documents/repos/OS-2019/FAT/fat/fat.cpp" "/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles/FAT.dir/fat/fat.cpp.o"
   "/Users/mac/Documents/repos/OS-2019/FAT/main.cpp" "/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles/FAT.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")

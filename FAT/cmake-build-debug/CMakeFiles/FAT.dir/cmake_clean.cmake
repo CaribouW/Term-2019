@@ -1,9 +1,10 @@
 file(REMOVE_RECURSE
   "CMakeFiles/FAT.dir/dsa.cpp.o"
+  "CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o"
+  "CMakeFiles/FAT.dir/fat/fat.cpp.o"
   "CMakeFiles/FAT.dir/main.cpp.o"
-  "CMakeFiles/FAT.dir/InstrEngine.cpp.o"
-  "FAT.pdb"
   "FAT"
+  "FAT.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

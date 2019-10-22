@@ -98,56 +98,29 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
 
         //-2是因为两个Reserv
         int startByte = dataBase + (currentClus - 2) * byteInCluster;
-        int check;
-        check = fseek(fat12, startByte, SEEK_SET);
-        if (check == -1)
-            printf("fseek in printChildren failed!");
-
-        check = fread(content, 1, byteInCluster, fat12);
-        if (check != byteInCluster)
-            printf("fread in printChildren failed!");
+        fseek(fat12, startByte, SEEK_SET);
+        fread(content, 1, byteInCluster, fat12);
 
         //解析content中的数据,依次处理各个条目,目录下每个条目结构与根目录下的目录结构相同
         int loop = 0;
         while (loop < byteInCluster) {
+            RootEntry entry{}; //根目录
+            RootEntry *rootEntry_ptr = &entry;
+            //read to the entry
+            fseek(fat12, startByte + loop, SEEK_SET);
+            fread(rootEntry_ptr, 1, 32, fat12);
+            if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) {
+                loop += 32;
+                continue;
+            }
             char tempName[12];  //暂存替换空格为点后的文件名
-            if (content[loop] == '\0') {
-                loop += 32;
-                continue;
-            }   //空条目不输出
-            //过滤非目标文件
-            int pathInvalid = 0;
-            for (int j = loop; j < loop + 11; j++) {
-                char ch = content[j];
-                if (!((isalnum(ch) || isblank(ch)))) {
-                    pathInvalid = 1;    //非英文及数字、空格
-                    break;
-                }
-            }
-            if (pathInvalid == 1) {
-                loop += 32;
-                continue;
-            }   //非目标文件不输出
-            int tempLong = -1;
-            for (int k = 0; k < 11; k++) {
-                if (content[loop + k] != ' ') {
-                    tempName[++tempLong] = content[loop + k];
-                } else {
-                    tempName[++tempLong] = '.';
-                    while (content[loop + k] == ' ') k++;
-                    k--;
-                }
-            }
-            tempLong++;
-            tempName[tempLong] = '\0';  //到此为止，把文件名提取出来放到tempName里
-
+            validPathTransform(*rootEntry_ptr, tempName);
             strcpy(fileName, tempName);
             printf("%s\n", fullName);
             ifOnlyDirectory = 1;
             loop += 32;
         }
         free(str);
-        //
         currentClus = value;
     }
     if (ifOnlyDirectory == 0)
@@ -169,37 +142,12 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
         check = fread(rootEntry_ptr, 1, 32, fat12);
         if (check != 32)
             printf("fread in printFiles failed!");
-
         base += 32;
 
-        if (rootEntry_ptr->DIR_Name[0] == '\0') continue;     //空条目不输出
-
-        //过滤非目标文件
-        int boolean = 0;
-        for (char ch : rootEntry_ptr->DIR_Name) {
-            if (!(isalnum(ch) || isblank(ch))) {
-                boolean = 1;    //非英文及数字、空格
-                break;
-            }
-        }
-        if (boolean == 1) continue;  //非目标文件不输出
+        if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) continue;     //空条目不输出
         //文件
-        if ((rootEntry_ptr->DIR_Attr & 0x10) == 0) {
-            int tempLong = -1;
-            for (int k = 0; k < 11; k++) {
-                if (rootEntry_ptr->DIR_Name[k] != ' ') {
-                    tempLong++;
-                    realName[tempLong] = rootEntry_ptr->DIR_Name[k];
-                } else {
-                    tempLong++;
-                    realName[tempLong] = '.';
-                    while (rootEntry_ptr->DIR_Name[k] == ' ') k++;
-                    k--;
-                }
-            }
-            tempLong++;
-            realName[tempLong] = '\0';  //到此为止，把文件名提取出来放到了realName里
-
+        if (!isDictory(rootEntry_ptr->DIR_Attr)) {
+            validPathTransform(*rootEntry_ptr, realName);
             //输出文件
             printf("%s\n", realName);
         } else {

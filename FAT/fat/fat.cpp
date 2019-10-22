@@ -141,7 +141,7 @@ void FAT::handleRoot(FILE *fat12, struct RootEntry *rootEntry_ptr) {
 
         } else {
             //输出目录及子文件
-            validPathTransform(*rootEntry_ptr, realName, true);
+            validPathTransform(*rootEntry_ptr, realName);
             dicList.emplace_back(string(realName));
         }
     }
@@ -159,7 +159,7 @@ void FAT::handleRoot(FILE *fat12, struct RootEntry *rootEntry_ptr) {
     }
 }
 
-void FAT::validPathTransform(const RootEntry &re, char tempName[12], const bool isDic) const {
+void FAT::validPathTransform(const RootEntry &re, char tempName[12]) const {
     if (re.ext[0] == ' ') {
         int tempLong = -1;
         for (char k : re.DIR_Name) {
@@ -176,7 +176,7 @@ void FAT::validPathTransform(const RootEntry &re, char tempName[12], const bool 
             if (re.DIR_Name[k] != ' ') {
                 tempName[++tempLong] = re.DIR_Name[k];
             } else {
-                if (!isDic)
+                if ((re.DIR_Attr & 0x10) == 0)
                     tempName[++tempLong] = '.';
                 while (re.DIR_Name[k] == ' ') k++;
                 k--;

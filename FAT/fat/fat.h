@@ -73,6 +73,10 @@ struct RootEntry {
     u16 DIR_WrtDate;
     u16 DIR_FstClus;    //开始簇号
     u32 DIR_FileSize;   //File size大小 Bytes
+
+    RootEntry() {
+        this->DIR_FstClus = -1;
+    }
 };
 
 class FAT {
@@ -127,9 +131,9 @@ public:
      * 如果文件大小超过512 byte ，那么就会包含多个cluster
      * TODO:
      * @param path: 首位.末位都不是/, 是否是文件夹已经预先设定好
-     * @return : 返回cluster号，如果文件/文件夹不存在，返回-1
+     * @return : 返回cluster entry，如果文件/文件夹不存在，返回-1 的cluster
      * */
-    int fetchClusterNum(const char *path) {
+    RootEntry fetchClusterEntry(const char *path) {
         RootEntry entry{}; //根目录
         RootEntry *rootEntry_ptr = &entry;
         string strPath(path);
@@ -149,23 +153,23 @@ public:
             validPathTransform(*rootEntry_ptr, realName);
             //根目录下的file
             if (target == realName && strings.size() == 1)
-                return rootEntry_ptr->DIR_FstClus;
+                return *rootEntry_ptr;
                 //属于子文件夹查询
             else if (strings.size() > 1) {
                 //获取子数组
                 strings = vector<string>(strings.begin() + 1, strings.end());
-                return fetchClusterNum(strings, rootEntry_ptr->DIR_FstClus);
+                return fetchClusterEntry(strings, rootEntry_ptr->DIR_FstClus);
             }
         }
         //没找到
-        return -1;
+        return RootEntry{};
     }
 
     /**
      * 子目录查询, 包含递归调用
      * */
-    int fetchClusterNum(vector<string> strings, int startClus) {
-        if (0 == strings.size())return -1;
+    RootEntry fetchClusterEntry(vector<string> strings, int startClus) {
+        if (0 == strings.size())return RootEntry{};
         string target = strings[0];
         int dataBase = fetchDataBaseInByte();
         int curClus = startClus;
@@ -196,11 +200,11 @@ public:
                 char tempName[12];  //暂存替换空格为点后的文件名
                 validPathTransform(*rootEntry_ptr, tempName);
                 if (target == tempName && 1 == strings.size()) {
-                    return rootEntry_ptr->DIR_FstClus;
+                    return *rootEntry_ptr;
                 } else if (strings.size() > 1) {
                     //获取子数组
                     strings = vector<string>(strings.begin() + 1, strings.end());
-                    return fetchClusterNum(strings, rootEntry_ptr->DIR_FstClus);
+                    return fetchClusterEntry(strings, rootEntry_ptr->DIR_FstClus);
                 }
                 loop += 32;
             }
@@ -208,7 +212,66 @@ public:
             //来到下一个位置
             curClus = value;
         }
-        return -1;
+        return RootEntry{};
+    }
+
+    /**
+     * 递归打印路径
+     * @param pre: path前缀
+     * @param entry: 入口对象
+     * */
+    void printPathRecur(string pre, const RootEntry &entry) {
+        int dataBase = fetchDataBaseInByte();
+        int currentClus = entry.DIR_FstClus;
+        int value = 0;//value為十六進制數，每次存儲2/4個字節
+        int ifOnlyDirectory = 0;
+        //如果值大于或等于0xFF8，则表示当前簇已经是文件的最后一个簇了。如果值为0xFF7，表示它是一个坏簇
+        vector<RootEntry> entries;
+        while (value < 0xFF8) {
+            value = getNextFatValue(fat12_ptr, currentClus);
+            if (value == 0xFF7) {
+                printf("bad cluster!Reading fails!\n");
+                break;
+            }
+            int byteInCluster = SecPerClus * BytsPerSec; //每簇的字节数
+            char *str = new char[byteInCluster]; //暂存从簇中读出的数据
+            char *content = str;
+
+            //-2是因为两个Reserv
+            int startByte = dataBase + (currentClus - 2) * byteInCluster;
+            fseek(fat12_ptr, startByte, SEEK_SET);
+            fread(content, 1, byteInCluster, fat12_ptr);
+
+            //解析content中的数据,依次处理各个条目,目录下每个条目结构与根目录下的目录结构相同
+            int loop = 0;
+            while (loop < byteInCluster) {
+                RootEntry entry{}; //根目录
+                RootEntry *rootEntry_ptr = &entry;
+                //read to the entry
+                fseek(fat12_ptr, startByte + loop, SEEK_SET);
+                fread(rootEntry_ptr, 1, 32, fat12_ptr);
+                //此时获取新的entry
+                if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) {
+                    loop += 32;
+                    continue;
+                }
+                entries.emplace_back(*rootEntry_ptr);
+                loop += 32;
+            }
+            free(str);
+            //来到下一个位置
+            currentClus = value;
+        }
+        //空dic
+        if (0 == entries.size()) {
+
+        } else {
+            for (const auto entry:entries) {
+                char tmpStr[12];
+                validPathTransform(entry, tmpStr);
+                cout << tmpStr << endl;
+            }
+        }
     }
 
     /**
@@ -275,7 +338,7 @@ private:
         return (attrCode & 0x10) != 0;
     }
 
-    void validPathTransform(const RootEntry &re, char tempName[12], const bool isDic = false) const;
+    void validPathTransform(const RootEntry &re, char tempName[12]) const;
 
 
 };

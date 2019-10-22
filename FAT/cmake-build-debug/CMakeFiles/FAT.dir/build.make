@@ -57,22 +57,9 @@ include CMakeFiles/FAT.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/FAT.dir/flags.make
 
-CMakeFiles/FAT.dir/dsa.cpp.o: CMakeFiles/FAT.dir/flags.make
-CMakeFiles/FAT.dir/dsa.cpp.o: dsa.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/FAT.dir/dsa.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/FAT.dir/dsa.cpp.o -c /Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/dsa.cpp
-
-CMakeFiles/FAT.dir/dsa.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/FAT.dir/dsa.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/dsa.cpp > CMakeFiles/FAT.dir/dsa.cpp.i
-
-CMakeFiles/FAT.dir/dsa.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/FAT.dir/dsa.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/dsa.cpp -o CMakeFiles/FAT.dir/dsa.cpp.s
-
 CMakeFiles/FAT.dir/main.cpp.o: CMakeFiles/FAT.dir/flags.make
 CMakeFiles/FAT.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/FAT.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/FAT.dir/main.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/FAT.dir/main.cpp.o -c /Users/mac/Documents/repos/OS-2019/FAT/main.cpp
 
 CMakeFiles/FAT.dir/main.cpp.i: cmake_force
@@ -85,7 +72,7 @@ CMakeFiles/FAT.dir/main.cpp.s: cmake_force
 
 CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o: CMakeFiles/FAT.dir/flags.make
 CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o: ../engine/InstrEngine.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o -c /Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.cpp
 
 CMakeFiles/FAT.dir/engine/InstrEngine.cpp.i: cmake_force
@@ -98,7 +85,7 @@ CMakeFiles/FAT.dir/engine/InstrEngine.cpp.s: cmake_force
 
 CMakeFiles/FAT.dir/fat/fat.cpp.o: CMakeFiles/FAT.dir/flags.make
 CMakeFiles/FAT.dir/fat/fat.cpp.o: ../fat/fat.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/FAT.dir/fat/fat.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/FAT.dir/fat/fat.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/FAT.dir/fat/fat.cpp.o -c /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.cpp
 
 CMakeFiles/FAT.dir/fat/fat.cpp.i: cmake_force
@@ -111,7 +98,6 @@ CMakeFiles/FAT.dir/fat/fat.cpp.s: cmake_force
 
 # Object files for target FAT
 FAT_OBJECTS = \
-"CMakeFiles/FAT.dir/dsa.cpp.o" \
 "CMakeFiles/FAT.dir/main.cpp.o" \
 "CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o" \
 "CMakeFiles/FAT.dir/fat/fat.cpp.o"
@@ -119,13 +105,12 @@ FAT_OBJECTS = \
 # External object files for target FAT
 FAT_EXTERNAL_OBJECTS =
 
-FAT: CMakeFiles/FAT.dir/dsa.cpp.o
 FAT: CMakeFiles/FAT.dir/main.cpp.o
 FAT: CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o
 FAT: CMakeFiles/FAT.dir/fat/fat.cpp.o
 FAT: CMakeFiles/FAT.dir/build.make
 FAT: CMakeFiles/FAT.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable FAT"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/mac/Documents/repos/OS-2019/FAT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable FAT"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/FAT.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

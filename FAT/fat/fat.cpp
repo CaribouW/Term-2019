@@ -105,3 +105,153 @@ void FAT::validPathTransform(const RootEntry &re, char tempName[12]) const {
     }
 
 }
+
+RootEntry FAT::fetchClusterEntry(const char *path) {
+    RootEntry entry{}; //根目录
+    RootEntry *rootEntry_ptr = &entry;
+    string strPath(path);
+    //字符串分隔, 最终strings的长度size和目录级别 N : N =
+    vector<string> strings = split(strPath, "/");
+    //针对第0个进行分析比较
+    string target = strings[0];
+    int base = fetchRootDicBaseInByte();
+    char realName[12];  //暂存将空格替换成点后的文件名
+    for (int i = 0; i < RootEntCnt; ++i) {
+        fseek(fat12_ptr, base, SEEK_SET);
+        fread(rootEntry_ptr, 1, 32, fat12_ptr);
+        base += 32;
+        if (!isValidPath(rootEntry_ptr->DIR_Name, 11))
+            continue;
+        //是文件
+        validPathTransform(*rootEntry_ptr, realName);
+        //根目录下的file
+        if (target == realName && strings.size() == 1)
+            return *rootEntry_ptr;
+            //属于子文件夹查询
+        else if (strings.size() > 1) {
+            //获取子数组
+            strings = vector<string>(strings.begin() + 1, strings.end());
+            return fetchClusterEntry(strings, rootEntry_ptr->DIR_FstClus);
+        }
+    }
+//没找到
+    return RootEntry{};
+}
+
+RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus){
+    if (0 == strings.size())return RootEntry{};
+    string target = strings[0];
+    int dataBase = fetchDataBaseInByte();
+    int curClus = startClus;
+    int value = 0;
+    while (value < 0xFF8) {
+        value = getNextFatValue(fat12_ptr, curClus);
+        if (value == 0xFF7) {
+            printf("bad cluster!Reading fails!\n");
+            break;
+        }
+        int byteInCluster = SecPerClus * BytsPerSec; //每簇的字节数
+        char *str = new char[byteInCluster]; //暂存从簇中读出的数据
+        char *content = str;
+        int startByte = dataBase + (curClus - 2) * byteInCluster;
+        fseek(fat12_ptr, startByte, SEEK_SET);
+        fread(content, 1, byteInCluster, fat12_ptr);
+        int loop = 0;
+        while (loop < byteInCluster) {
+            RootEntry entry{}; //根目录
+            RootEntry *rootEntry_ptr = &entry;
+            //read to the entry
+            fseek(fat12_ptr, startByte + loop, SEEK_SET);
+            fread(rootEntry_ptr, 1, 32, fat12_ptr);
+            if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) {
+                loop += 32;
+                continue;
+            }
+            char tempName[12];  //暂存替换空格为点后的文件名
+            validPathTransform(*rootEntry_ptr, tempName);
+            if (target == tempName && 1 == strings.size()) {
+                return *rootEntry_ptr;
+            } else if (strings.size() > 1) {
+                //获取子数组
+                strings = vector<string>(strings.begin() + 1, strings.end());
+                return fetchClusterEntry(strings, rootEntry_ptr->DIR_FstClus);
+            }
+            loop += 32;
+        }
+        free(str);
+        //来到下一个位置
+        curClus = value;
+    }
+    return RootEntry{};
+}
+
+void FAT::printPathRecur(string pre, const RootEntry &entry) {
+    int dataBase = fetchDataBaseInByte();
+    int currentClus = entry.DIR_FstClus;
+    int value = 0;//value為十六進制數，每次存儲2/4個字節
+    int ifOnlyDirectory = 0;
+    //如果值大于或等于0xFF8，则表示当前簇已经是文件的最后一个簇了。如果值为0xFF7，表示它是一个坏簇
+    vector<RootEntry> entries;
+    while (value < 0xFF8) {
+        value = getNextFatValue(fat12_ptr, currentClus);
+        if (value == 0xFF7) {
+            printf("bad cluster!Reading fails!\n");
+            break;
+        }
+        int byteInCluster = SecPerClus * BytsPerSec; //每簇的字节数
+        char *str = new char[byteInCluster]; //暂存从簇中读出的数据
+        char *content = str;
+
+        //-2是因为两个Reserv
+        int startByte = dataBase + (currentClus - 2) * byteInCluster;
+        //解析content中的数据,依次处理各个条目,目录下每个条目结构与根目录下的目录结构相同
+        int loop = 0;
+        while (loop < byteInCluster) {
+            RootEntry entry{}; //根目录
+            RootEntry *rootEntry_ptr = &entry;
+            //read to the entry
+            fseek(fat12_ptr, startByte + loop, SEEK_SET);
+            fread(rootEntry_ptr, 1, 32, fat12_ptr);
+            //此时获取新的entry
+            if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) {
+                loop += 32;
+                continue;
+            }
+            entries.emplace_back(*rootEntry_ptr);
+            loop += 32;
+        }
+        free(str);
+        //来到下一个位置
+        currentClus = value;
+    }
+    //空dic
+    if (0 == entries.size()) {
+        cout << ".\t..\n";
+        return;
+    } else {
+        vector<RootEntry> dicList;
+        cout << pre + "/:\n";
+        for (const auto entry:entries) {
+            char tmpStr[12];
+            //如果是dic，那么就递归调用print
+            validPathTransform(entry, tmpStr);
+            if (tmpStr[0] != '.' && isDictory(entry.DIR_Attr))
+                dicList.emplace_back(entry);
+            //输出
+            cout << tmpStr << '\t' << entry.DIR_FileSize;
+        }
+        cout << endl;
+        //继续输出
+        for (const auto dicEntry:dicList) {
+            char tmpStr[12];
+            //如果是dic，那么就递归调用print
+            validPathTransform(dicEntry, tmpStr);
+            printPathRecur(pre + "/" + tmpStr, dicEntry);
+        }
+    }
+}
+
+void FAT::printPathInDetail(string pre, const RootEntry &entry) {
+
+}
+

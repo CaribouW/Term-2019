@@ -3,4 +3,4 @@ project(FAT)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(FAT cmake-build-debug/dsa.cpp main.cpp fat/fat.h engine/InstrEngine.cpp engine/InstrEngine.h fat/fat.cpp)
+add_executable(FAT main.cpp fat/fat.h engine/InstrEngine.cpp engine/InstrEngine.h fat/fat.cpp)

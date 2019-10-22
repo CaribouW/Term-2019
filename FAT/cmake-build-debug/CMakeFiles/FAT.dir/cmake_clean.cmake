@@ -1,5 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/FAT.dir/dsa.cpp.o"
   "CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o"
   "CMakeFiles/FAT.dir/fat/fat.cpp.o"
   "CMakeFiles/FAT.dir/main.cpp.o"

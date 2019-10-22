@@ -3,10 +3,12 @@
 
 CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o: ../engine/InstrEngine.cpp
 CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o: ../engine/InstrEngine.h
+CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o: ../fat/fat.h
 
 CMakeFiles/FAT.dir/fat/fat.cpp.o: ../fat/fat.cpp
 CMakeFiles/FAT.dir/fat/fat.cpp.o: ../fat/fat.h
 
+CMakeFiles/FAT.dir/main.cpp.o: ../engine/InstrEngine.h
 CMakeFiles/FAT.dir/main.cpp.o: ../fat/fat.h
 CMakeFiles/FAT.dir/main.cpp.o: ../main.cpp
 

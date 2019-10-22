@@ -134,11 +134,11 @@ RootEntry FAT::fetchClusterEntry(const char *path) {
             return fetchClusterEntry(strings, rootEntry_ptr->DIR_FstClus);
         }
     }
-//没找到
+    //没找到
     return RootEntry{};
 }
 
-RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus){
+RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus) {
     if (0 == strings.size())return RootEntry{};
     string target = strings[0];
     int dataBase = fetchDataBaseInByte();
@@ -171,7 +171,7 @@ RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus){
             validPathTransform(*rootEntry_ptr, tempName);
             if (target == tempName && 1 == strings.size()) {
                 return *rootEntry_ptr;
-            } else if (strings.size() > 1) {
+            } else if (target == tempName && strings.size() > 1) {
                 //获取子数组
                 strings = vector<string>(strings.begin() + 1, strings.end());
                 return fetchClusterEntry(strings, rootEntry_ptr->DIR_FstClus);
@@ -186,72 +186,55 @@ RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus){
 }
 
 void FAT::printPathRecur(string pre, const RootEntry &entry) {
-    int dataBase = fetchDataBaseInByte();
-    int currentClus = entry.DIR_FstClus;
-    int value = 0;//value為十六進制數，每次存儲2/4個字節
-    int ifOnlyDirectory = 0;
-    //如果值大于或等于0xFF8，则表示当前簇已经是文件的最后一个簇了。如果值为0xFF7，表示它是一个坏簇
-    vector<RootEntry> entries;
-    while (value < 0xFF8) {
-        value = getNextFatValue(fat12_ptr, currentClus);
-        if (value == 0xFF7) {
-            printf("bad cluster!Reading fails!\n");
-            break;
-        }
-        int byteInCluster = SecPerClus * BytsPerSec; //每簇的字节数
-        char *str = new char[byteInCluster]; //暂存从簇中读出的数据
-        char *content = str;
-
-        //-2是因为两个Reserv
-        int startByte = dataBase + (currentClus - 2) * byteInCluster;
-        //解析content中的数据,依次处理各个条目,目录下每个条目结构与根目录下的目录结构相同
-        int loop = 0;
-        while (loop < byteInCluster) {
-            RootEntry entry{}; //根目录
-            RootEntry *rootEntry_ptr = &entry;
-            //read to the entry
-            fseek(fat12_ptr, startByte + loop, SEEK_SET);
-            fread(rootEntry_ptr, 1, 32, fat12_ptr);
-            //此时获取新的entry
-            if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) {
-                loop += 32;
-                continue;
-            }
-            entries.emplace_back(*rootEntry_ptr);
-            loop += 32;
-        }
-        free(str);
-        //来到下一个位置
-        currentClus = value;
-    }
-    //空dic
-    if (0 == entries.size()) {
-        cout << ".\t..\n";
+    //文件
+    char name[12];
+    if (!isDictory(entry.DIR_Attr)) {
+        validPathTransform(entry, name);
+        cout << pre + '/' + name << endl;
         return;
-    } else {
-        vector<RootEntry> dicList;
-        cout << pre + "/:\n";
-        for (const auto entry:entries) {
-            char tmpStr[12];
-            //如果是dic，那么就递归调用print
-            validPathTransform(entry, tmpStr);
-            if (tmpStr[0] != '.' && isDictory(entry.DIR_Attr))
-                dicList.emplace_back(entry);
-            //输出
-            cout << tmpStr << '\t' << entry.DIR_FileSize;
-        }
-        cout << endl;
-        //继续输出
-        for (const auto dicEntry:dicList) {
-            char tmpStr[12];
-            //如果是dic，那么就递归调用print
-            validPathTransform(dicEntry, tmpStr);
-            printPathRecur(pre + "/" + tmpStr, dicEntry);
-        }
+    }
+    //文件夹
+    auto sub = fetchPathSolution(entry);
+
+    //sub[0]为diclist, sub[1]为fileList
+    for (const auto e:sub[0]) {
+        validPathTransform(e, name);
+        cout << pre + '/' + name << '\t';
+    }
+    for (const auto e:sub[1]) {
+        validPathTransform(e, name);
+        cout << pre + '/' + name << '\t';
+    }
+    //递归
+    for (const auto e:sub[0]) {
+        validPathTransform(e, name);
+        printPathRecur(pre + '/' + name, e);
     }
 }
 
 void FAT::printPathInDetail(string pre, const RootEntry &entry) {
 
+}
+
+void FAT::printRoot() {
+    RootEntry entry{}; //根目录
+    RootEntry *rootEntry_ptr = &entry;
+    int base = fetchRootDicBaseInByte();
+    char realName[12];  //暂存将空格替换成点后的文件名
+    for (int i = 0; i < RootEntCnt; ++i) {
+        fseek(fat12_ptr, base, SEEK_SET);
+        fread(rootEntry_ptr, 1, 32, fat12_ptr);
+        base += 32;
+        if (!isValidPath(rootEntry_ptr->DIR_Name, 11))
+            continue;
+        //是文件
+        validPathTransform(*rootEntry_ptr, realName);
+        if (isDictory(rootEntry_ptr->DIR_Attr))
+            printPathRecur("/" + string(realName), *rootEntry_ptr);
+        else {
+            cout << realName << '\t';
+        }
+    }
+    //没找到
 }
 

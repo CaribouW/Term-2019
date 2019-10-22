@@ -128,6 +128,11 @@ public:
     RootEntry fetchClusterEntry(vector<string> strings, int startClus);
 
     /**
+     * 从根目录开始打印
+     * */
+    void printRoot();
+
+    /**
      * 递归打印路径
      * @param pre: path前缀
      * @param entry: 入口对象
@@ -153,6 +158,7 @@ public:
         fread(str, 1, SecPerClus * BytsPerSec, fat12_ptr);
         return string(str);
     }
+
     /**
         * 根据entry , 获取其子目录的vector.
         * */
@@ -210,6 +216,7 @@ public:
         return ans;
 
     }
+
 private:
     void fillBPB(FILE *fat12, struct BPB *bpb_ptr);
 

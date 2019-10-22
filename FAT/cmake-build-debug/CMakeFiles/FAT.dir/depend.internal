@@ -4,9 +4,11 @@
 CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o
  /Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.cpp
  /Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.h
+ /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
 CMakeFiles/FAT.dir/fat/fat.cpp.o
  /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.cpp
  /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
 CMakeFiles/FAT.dir/main.cpp.o
+ /Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.h
  /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
  /Users/mac/Documents/repos/OS-2019/FAT/main.cpp

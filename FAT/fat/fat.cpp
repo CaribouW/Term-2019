@@ -70,17 +70,9 @@ int FAT::getNextFatValue(FILE *fat12, int num)   //NUM=开始簇号DIR_FstClus
 }
 
 
-void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
+void FAT::printChildren(FILE *fat12, string directory, int startClus) {
     //数据区的第一个簇（即2号簇）的偏移字节
     int dataBase = fetchDataBaseInByte();
-    //存放文件路径及全名
-    char fullName[24];
-    int strLength = strlen(directory);
-    strcpy(fullName, directory);
-    fullName[strLength] = '/';
-    strLength++;
-    fullName[strLength] = '\0';
-    char *fileName = &fullName[strLength];
 
     int currentClus = startClus;
     int value = 0;//value為十六進制數，每次存儲2/4個字節
@@ -115,16 +107,13 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
             }
             char tempName[12];  //暂存替换空格为点后的文件名
             validPathTransform(*rootEntry_ptr, tempName);
-            strcpy(fileName, tempName);
-            printf("%s\n", fullName);
+            printf("%s\n", tempName);
             ifOnlyDirectory = 1;
             loop += 32;
         }
         free(str);
         currentClus = value;
     }
-    if (ifOnlyDirectory == 0)
-        printf("%s\n", fullName);  //空目录的情况下，输出目录
 }
 
 void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
@@ -132,39 +121,48 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
     int check;
     char realName[12];  //暂存将空格替换成点后的文件名
 
+    vector<string> fileList;
+    vector<string> dicList;
     //依次处理根目录中的各个条目
     for (int i = 0; i < RootEntCnt; i++) {
-
-        check = fseek(fat12, base, SEEK_SET);
-        if (check == -1)
-            printf("fseek in printFiles failed!");
-
-        check = fread(rootEntry_ptr, 1, 32, fat12);
-        if (check != 32)
-            printf("fread in printFiles failed!");
+        fseek(fat12, base, SEEK_SET);
+        fread(rootEntry_ptr, 1, 32, fat12);
         base += 32;
 
         if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) continue;     //空条目不输出
         //文件
         if (!isDictory(rootEntry_ptr->DIR_Attr)) {
-            validPathTransform(*rootEntry_ptr, realName);
             //输出文件
-            printf("%s\n", realName);
+            validPathTransform(*rootEntry_ptr, realName);
+            fileList.emplace_back(string(realName));
         } else {
             //输出目录及子文件
-            validPathTransform(*rootEntry_ptr, realName);
-            printChildren(fat12, realName, rootEntry_ptr->DIR_FstClus);
+            validPathTransform(*rootEntry_ptr, realName, true);
+            dicList.emplace_back(string(realName));
         }
+    }
+    cout << "/:\n";
+    for (const auto &path : fileList) {
+        cout << path << '\t';
+    }
+    cout << endl;
+
+    fseek(fat12, base, SEEK_SET);
+    fread(rootEntry_ptr, 1, 32, fat12);
+    for (const auto &dic:dicList) {
+        cout << "/" << dic << "/:\n";
+        printChildren(fat12, dic, rootEntry_ptr->DIR_FstClus);
     }
 }
 
-void FAT::validPathTransform(const RootEntry &re, char tempName[12]) const {
+void FAT::validPathTransform(const RootEntry &re, char tempName[12], const bool isDic) const {
     int tempLong = -1;
     for (int k = 0; k < 11; k++) {
         if (re.DIR_Name[k] != ' ') {
             tempName[++tempLong] = re.DIR_Name[k];
         } else {
-            tempName[++tempLong] = '.';
+            if (!isDic)
+                tempName[++tempLong] = '.';
             while (re.DIR_Name[k] == ' ') k++;
             k--;
         }

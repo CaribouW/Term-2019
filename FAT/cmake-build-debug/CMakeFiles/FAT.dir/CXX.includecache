@@ -6,6 +6,14 @@
 
 #IncludeRegexTransform: 
 
+/Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.cpp
+InstrEngine.h
+/Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.h
+
+/Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.h
+../fat/fat.h
+/Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
+
 /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.cpp
 fat.h
 /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
@@ -24,5 +32,11 @@ cctype
 iostream
 -
 vector
+-
+
+/Users/mac/Documents/repos/OS-2019/FAT/main.cpp
+engine/InstrEngine.h
+/Users/mac/Documents/repos/OS-2019/FAT/engine/InstrEngine.h
+regex
 -
 

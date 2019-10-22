@@ -159,6 +159,18 @@ public:
         return string(str);
     }
 
+    string readFileContent(const RootEntry &entry) {
+        int startByte = fetchDataBaseInByte() + (entry.DIR_FstClus - 2) * SecPerClus * BytsPerSec;
+        fseek(fat12_ptr, startByte, SEEK_SET);
+        int32_t itemNum = entry.DIR_FileSize > SecPerClus * BytsPerSec ? entry.DIR_FileSize : SecPerClus * BytsPerSec;
+        char *str = new char[itemNum];
+        fread(str, 1, itemNum, fat12_ptr);
+        str[itemNum] = '\0';
+        string ans(str);
+        free(str);
+        return ans;
+    }
+
     /**
         * 根据entry , 获取其子目录的vector.
         * */
@@ -207,7 +219,6 @@ public:
                     fileList.emplace_back(entry);
                 loop += 32;
             }
-            free(str);
             //来到下一个位置
             currentClus = value;
         }
@@ -215,6 +226,10 @@ public:
         ans.emplace_back(fileList);
         return ans;
 
+    }
+
+    int getNextFatValue(int num) {
+        return getNextFatValue(fat12_ptr, num);
     }
 
 private:

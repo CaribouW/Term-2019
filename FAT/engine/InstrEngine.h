@@ -30,7 +30,8 @@ public:
      * */
     void execute_cat(string path) {
         RootEntry re = fat.fetchClusterEntry((char *) path.c_str());
-        string content = fat.readFileContent(re.DIR_FstClus);
+        //while (value < 0xFF8) 如果文件容量过大，那么就分到多个sec里面
+        string content = fat.readFileContent(re);
         //print
         printf("%s\n", (char *) content.c_str());
     }

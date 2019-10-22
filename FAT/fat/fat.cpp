@@ -178,7 +178,6 @@ RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus) {
             }
             loop += 32;
         }
-        free(str);
         //来到下一个位置
         curClus = value;
     }

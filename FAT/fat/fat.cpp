@@ -186,30 +186,34 @@ RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus) {
 }
 
 void FAT::printPathRecur(string pre, const RootEntry &entry) {
-    //文件
+    //如果是单个文件文件
     char name[12];
     if (!isDictory(entry.DIR_Attr)) {
         validPathTransform(entry, name);
-        cout << pre + '/' + name << endl;
+        printf("%s/%s  ", (char *) pre.c_str(), name);
         return;
     }
     //文件夹
     auto sub = fetchPathSolution(entry);
 
+    //输出前缀
+    printf("%s/:\n", (char *) pre.c_str());
     //sub[0]为diclist, sub[1]为fileList
     for (const auto e:sub[0]) {
         validPathTransform(e, name);
-        cout << pre + '/' + name << '\t';
+        printf("%s/%s  ", (char *) pre.c_str(), name);
     }
     for (const auto e:sub[1]) {
         validPathTransform(e, name);
-        cout << pre + '/' + name << '\t';
+        printf("%s/%s  ", (char *) pre.c_str(), name);
     }
+    printf("\n");
     //递归
     for (const auto e:sub[0]) {
         validPathTransform(e, name);
         printPathRecur(pre + '/' + name, e);
     }
+    printf("\n");
 }
 
 void FAT::printPathInDetail(string pre, const RootEntry &entry) {
@@ -221,6 +225,8 @@ void FAT::printRoot() {
     RootEntry *rootEntry_ptr = &entry;
     int base = fetchRootDicBaseInByte();
     char realName[12];  //暂存将空格替换成点后的文件名
+    vector<RootEntry> dicList;
+    vector<RootEntry> fileList;
     for (int i = 0; i < RootEntCnt; ++i) {
         fseek(fat12_ptr, base, SEEK_SET);
         fread(rootEntry_ptr, 1, 32, fat12_ptr);
@@ -230,11 +236,29 @@ void FAT::printRoot() {
         //是文件
         validPathTransform(*rootEntry_ptr, realName);
         if (isDictory(rootEntry_ptr->DIR_Attr))
-            printPathRecur("/" + string(realName), *rootEntry_ptr);
+            dicList.emplace_back(*rootEntry_ptr);
         else {
-            cout << realName << '\t';
+            fileList.emplace_back(*rootEntry_ptr);
         }
     }
+    //==================
+    //for print
+    printf("/:\n");
+    for (int i = 0; i < fileList.size(); ++i) {
+        validPathTransform(fileList[i], realName);
+        printf("%s  ", realName);
+    }
+    for (int i = 0; i < dicList.size(); ++i) {
+        validPathTransform(dicList[i], realName);
+        printf("%s  ", realName);
+    }
+    printf("\n");
+    for (int i = 0; i < dicList.size(); ++i) {
+        validPathTransform(dicList[i], realName);
+        string pre = "/" + string(realName);
+        printPathRecur(pre, dicList[i]);
+    }
+    printf("\n");
     //没找到
 }
 

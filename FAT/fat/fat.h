@@ -30,7 +30,7 @@ static std::vector<std::string> split(std::string str, std::string pattern) {
     return result;
 }
 
-static std::string &trim(std::string &s) {
+static std::string trim(std::string &s) {
     if (s.empty()) {
         return s;
     }
@@ -134,7 +134,7 @@ public:
 
     /**
      * 递归打印路径
-     * @param pre: path前缀
+     * @param pre: path前缀 , 不包含最后一个 /
      * @param entry: 入口对象
      * */
     void printPathRecur(string pre, const RootEntry &entry);

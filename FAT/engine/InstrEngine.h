@@ -20,9 +20,7 @@ public:
      * */
     void execute_ls(string path, bool isDetail = false) {
         if ("/" == path) fat.printRoot();
-        else {
-            fat.printPathRecur(path, fat.fetchClusterEntry((char *) path.c_str()));
-        }
+        else fat.printPathRecur(path, fat.fetchClusterEntry((char *) path.c_str()));
     }
 
     /**
@@ -31,7 +29,8 @@ public:
     void execute_cat(string path) {
         RootEntry re = fat.fetchClusterEntry((char *) path.c_str());
         string content = fat.readFileContent(re.DIR_FstClus);
-        cout << content << endl;
+        //print
+        printf("%s\n", (char *) content.c_str());
     }
 
 private:

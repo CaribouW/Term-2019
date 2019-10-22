@@ -185,42 +185,69 @@ RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus) {
     return RootEntry{};
 }
 
-void FAT::printPathRecur(string pre, const RootEntry &entry) {
-    //如果是单个文件文件
-    char name[12];
-    if (!isDictory(entry.DIR_Attr)) {
-        validPathTransform(entry, name);
-        printf("%s/%s  ", (char *) pre.c_str(), name);
-        return;
-    }
-    //文件夹
-    auto sub = fetchPathSolution(entry);
+void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
+    if (!isDetail) {
+        //如果是单个文件文件
+        char name[12];
+        if (!isDictory(entry.DIR_Attr)) {
+            validPathTransform(entry, name);
+            printf("%s/%s  ", (char *) pre.c_str(), name);
+            return;
+        }
+        //文件夹
+        auto sub = fetchPathSolution(entry);
 
-    //输出前缀
-    printf("%s/:\n", (char *) pre.c_str());
-    //sub[0]为diclist, sub[1]为fileList
-    for (const auto e:sub[0]) {
-        validPathTransform(e, name);
-        printf("%s/%s  ", (char *) pre.c_str(), name);
+        //输出前缀
+        printf("%s/:\n", (char *) pre.c_str());
+        printf(".  ..  ");
+        //sub[0]为diclist, sub[1]为fileList
+        for (const auto e:sub[0]) {
+            validPathTransform(e, name);
+            printf("%s/%s  ", (char *) pre.c_str(), name);
+        }
+        for (const auto e:sub[1]) {
+            validPathTransform(e, name);
+            printf("%s/%s  ", (char *) pre.c_str(), name);
+        }
+        printf("\n");
+        //递归
+        for (const auto e:sub[0]) {
+            validPathTransform(e, name);
+            printPathRecur(pre + '/' + name, e);
+        }
+        printf("\n");
+    } else {
+        char name[12];
+        //单个文件，输出size
+        if (!isDictory(entry.DIR_Attr)) {
+            validPathTransform(entry, name);
+            printf("%s/%s  %u", (char *) pre.c_str(), name, entry.DIR_FileSize);
+            return;
+        }
+        //文件夹
+        auto sub = fetchPathSolution(entry);
+        //输出前缀
+        printf("%s/ %lu %lu:\n", (char *) pre.c_str(), sub[0].size(), sub[1].size());
+        printf(".\n..\n");
+        for (const auto e:sub[0]) {
+            //dic
+            validPathTransform(e, name);
+            auto lists = fetchPathSolution(e);
+            printf("%s/%s  %lu %lu\n", (char *) pre.c_str(), name, lists[0].size(), lists[1].size());
+        }
+        for (const auto e:sub[1]) {
+            validPathTransform(e, name);
+            printf("%s/%s  %u\n", (char *) pre.c_str(), name, e.DIR_FileSize);
+        }
+        //递归
+        for (const auto e:sub[0]) {
+            validPathTransform(e, name);
+            printPathRecur(pre + '/' + name, e, true);
+        }
     }
-    for (const auto e:sub[1]) {
-        validPathTransform(e, name);
-        printf("%s/%s  ", (char *) pre.c_str(), name);
-    }
-    printf("\n");
-    //递归
-    for (const auto e:sub[0]) {
-        validPathTransform(e, name);
-        printPathRecur(pre + '/' + name, e);
-    }
-    printf("\n");
 }
 
-void FAT::printPathInDetail(string pre, const RootEntry &entry) {
-
-}
-
-void FAT::printRoot() {
+void FAT::printRoot(bool isDetail) {
     RootEntry entry{}; //根目录
     RootEntry *rootEntry_ptr = &entry;
     int base = fetchRootDicBaseInByte();
@@ -243,22 +270,44 @@ void FAT::printRoot() {
     }
     //==================
     //for print
-    printf("/:\n");
-    for (int i = 0; i < fileList.size(); ++i) {
-        validPathTransform(fileList[i], realName);
-        printf("%s  ", realName);
+    if (!isDetail) {
+        printf("/:\n");
+        for (int i = 0; i < fileList.size(); ++i) {
+            validPathTransform(fileList[i], realName);
+            printf("%s  ", realName);
+        }
+        for (int i = 0; i < dicList.size(); ++i) {
+            validPathTransform(dicList[i], realName);
+            printf("%s  ", realName);
+        }
+        printf("\n");
+        for (int i = 0; i < dicList.size(); ++i) {
+            validPathTransform(dicList[i], realName);
+            string pre = "/" + string(realName);
+            printPathRecur(pre, dicList[i]);
+        }
+        printf("\n");
+    } else {
+        int dicNum = dicList.size(), fileNum = fileList.size();
+        printf("/ %d %d:\n", dicNum, fileNum);
+        //每一个dic都需要计算
+        for (int i = 0; i < fileList.size(); ++i) {
+            validPathTransform(fileList[i], realName);
+            printf("%s  %u\n", realName, fileList[i].DIR_FileSize);
+        }
+        for (int i = 0; i < dicList.size(); ++i) {
+            validPathTransform(dicList[i], realName);
+            //根据realName获取vector
+            auto lists = fetchPathSolution(fileList[i]);
+            printf("%s  %lu %lu\n", realName, lists[0].size(), lists[1].size());
+        }
+        //递归
+        for (int i = 0; i < dicList.size(); ++i) {
+            validPathTransform(dicList[i], realName);
+            string pre = "/" + string(realName);
+            printPathRecur(pre, dicList[i], true);
+        }
     }
-    for (int i = 0; i < dicList.size(); ++i) {
-        validPathTransform(dicList[i], realName);
-        printf("%s  ", realName);
-    }
-    printf("\n");
-    for (int i = 0; i < dicList.size(); ++i) {
-        validPathTransform(dicList[i], realName);
-        string pre = "/" + string(realName);
-        printPathRecur(pre, dicList[i]);
-    }
-    printf("\n");
     //没找到
 }
 

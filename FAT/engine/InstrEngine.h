@@ -17,10 +17,12 @@ public:
 
     /**
      * ls指令实现
+     * @param path: 目标路径, 开始结尾都没有/
+     * @param isDetail: 是否是 -l
      * */
     void execute_ls(string path, bool isDetail = false) {
-        if ("/" == path) fat.printRoot();
-        else fat.printPathRecur(path, fat.fetchClusterEntry((char *) path.c_str()));
+        if ("/" == path) fat.printRoot(isDetail);
+        else fat.printPathRecur(path, fat.fetchClusterEntry((char *) path.c_str()), isDetail);
     }
 
     /**

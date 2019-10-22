@@ -130,14 +130,14 @@ public:
     /**
      * 从根目录开始打印
      * */
-    void printRoot();
+    void printRoot(bool isDetail = false);
 
     /**
      * 递归打印路径
      * @param pre: path前缀 , 不包含最后一个 /
      * @param entry: 入口对象
      * */
-    void printPathRecur(string pre, const RootEntry &entry);
+    void printPathRecur(string pre, const RootEntry &entry, bool isDetail = false);
 
     /**
      * 递归打印路径, 并且给出具体的文件信息

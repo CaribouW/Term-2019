@@ -19,7 +19,7 @@ static auto ls_detail_file = regex("(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+)|"
 int main() {
     //文件引用
     printf("Command begin\nread from {test.img} file\n");
-    InstrEngine i("test.img");
+    InstrEngine engine("test.img");
     char *input = new char[1024];
     printf("> ");
     cin.getline(input, 1024);
@@ -31,21 +31,26 @@ int main() {
         vector<string> comList = split(line, " ");
         //ls stage
         if (regex_match(line, ls_default)) {
-            i.execute_ls("/");
+            engine.execute_ls("/");
         } else if (regex_match(line, ls_detail_default)) {
-            i.execute_ls("/", true);
+            engine.execute_ls("/", true);
         } else if (regex_match(line, cat_pattern)) {
             //去除首位的 /
             string path = regex_replace(comList[1], regex("^/|/$"), "");
-            i.execute_cat(path);
+            engine.execute_cat(path);
         } else if (regex_match(line, ls_simple_file)) {
             //ls <file>
             string path = regex_replace(comList[1], regex("^/|/$"), "");
-            i.execute_ls(path);
+            engine.execute_ls(path);
         } else if (regex_match(line, ls_detail_file)) {
             //ls -l <file>
-            string path = regex_replace(comList[1], regex("^/|/$"), "");
-            i.execute_ls(path, true);
+            int index;
+            for (index = 1; index < comList.size(); ++index) {
+                if (comList[index][0] != '-')break;
+            }
+            string path = regex_replace(comList[index], regex("^/|/$"), "");
+
+            engine.execute_ls(path, true);
         } else {
             printf("**Error:command not legal!\n");
         }

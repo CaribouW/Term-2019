@@ -12,7 +12,33 @@ using namespace std;
 typedef unsigned char u8;//1字节
 typedef unsigned short u16;//2字节
 typedef unsigned int u32; //4字节
+//字符串分割函数
+static std::vector<std::string> split(std::string str, std::string pattern) {
+    std::string::size_type pos;
+    std::vector<std::string> result;
+    str += pattern;//扩展字符串以方便操作
+    int size = str.size();
 
+    for (int i = 0; i < size; i++) {
+        pos = str.find(pattern, i);
+        if (pos < size) {
+            std::string s = str.substr(i, pos - i);
+            result.push_back(s);
+            i = pos + pattern.size() - 1;
+        }
+    }
+    return result;
+}
+
+static std::string &trim(std::string &s) {
+    if (s.empty()) {
+        return s;
+    }
+
+    s.erase(0, s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+}
 //(physical sector number) = 33 + (FAT entry number) - 2
 
 //前11Bytes ignore
@@ -84,15 +110,118 @@ public:
     void printRootFiles() {
         RootEntry rootEntry{}; //根目录
         RootEntry *rootEntry_ptr = &rootEntry;
-        printFiles(this->fat12_ptr, rootEntry_ptr);
+        handleRoot(this->fat12_ptr, rootEntry_ptr);
     }
 
-/**
+    /**
      * 输出目录下文件
      * @param directory: 目录名称,仅仅是作为输出的时候的前缀
      * @param startClus: 开始簇,作为链表形式进行输出
      * */
     void printChildren(FILE *fat12, string directory, int startClus);
+
+    /**
+     * 包含递归查询
+     * ls /NJU 和 cat a.txt 都会使用到该方法
+     * 根据路径名称,以及是否是文件夹, 来获取文件的 cluster号
+     * 如果文件大小超过512 byte ，那么就会包含多个cluster
+     * TODO:
+     * @param path: 首位.末位都不是/, 是否是文件夹已经预先设定好
+     * @return : 返回cluster号，如果文件/文件夹不存在，返回-1
+     * */
+    int fetchClusterNum(const char *path) {
+        RootEntry entry{}; //根目录
+        RootEntry *rootEntry_ptr = &entry;
+        string strPath(path);
+        //字符串分隔, 最终strings的长度size和目录级别 N : N =
+        vector<string> strings = split(strPath, "/");
+        //针对第0个进行分析比较
+        string target = strings[0];
+        int base = fetchRootDicBaseInByte();
+        char realName[12];  //暂存将空格替换成点后的文件名
+        for (int i = 0; i < RootEntCnt; ++i) {
+            fseek(fat12_ptr, base, SEEK_SET);
+            fread(rootEntry_ptr, 1, 32, fat12_ptr);
+            base += 32;
+            if (!isValidPath(rootEntry_ptr->DIR_Name, 11))
+                continue;
+            //是文件
+            validPathTransform(*rootEntry_ptr, realName);
+            //根目录下的file
+            if (target == realName && strings.size() == 1)
+                return rootEntry_ptr->DIR_FstClus;
+                //属于子文件夹查询
+            else if (strings.size() > 1) {
+                //获取子数组
+                strings = vector<string>(strings.begin() + 1, strings.end());
+                return fetchClusterNum(strings, rootEntry_ptr->DIR_FstClus);
+            }
+        }
+        //没找到
+        return -1;
+    }
+
+    /**
+     * 子目录查询, 包含递归调用
+     * */
+    int fetchClusterNum(vector<string> strings, int startClus) {
+        if (0 == strings.size())return -1;
+        string target = strings[0];
+        int dataBase = fetchDataBaseInByte();
+        int curClus = startClus;
+        int value = 0;
+        while (value < 0xFF8) {
+            value = getNextFatValue(fat12_ptr, curClus);
+            if (value == 0xFF7) {
+                printf("bad cluster!Reading fails!\n");
+                break;
+            }
+            int byteInCluster = SecPerClus * BytsPerSec; //每簇的字节数
+            char *str = new char[byteInCluster]; //暂存从簇中读出的数据
+            char *content = str;
+            int startByte = dataBase + (curClus - 2) * byteInCluster;
+            fseek(fat12_ptr, startByte, SEEK_SET);
+            fread(content, 1, byteInCluster, fat12_ptr);
+            int loop = 0;
+            while (loop < byteInCluster) {
+                RootEntry entry{}; //根目录
+                RootEntry *rootEntry_ptr = &entry;
+                //read to the entry
+                fseek(fat12_ptr, startByte + loop, SEEK_SET);
+                fread(rootEntry_ptr, 1, 32, fat12_ptr);
+                if (!isValidPath(rootEntry_ptr->DIR_Name, 11)) {
+                    loop += 32;
+                    continue;
+                }
+                char tempName[12];  //暂存替换空格为点后的文件名
+                validPathTransform(*rootEntry_ptr, tempName);
+                if (target == tempName && 1 == strings.size()) {
+                    return rootEntry_ptr->DIR_FstClus;
+                } else if (strings.size() > 1) {
+                    //获取子数组
+                    strings = vector<string>(strings.begin() + 1, strings.end());
+                    return fetchClusterNum(strings, rootEntry_ptr->DIR_FstClus);
+                }
+                loop += 32;
+            }
+            free(str);
+            //来到下一个位置
+            curClus = value;
+        }
+        return -1;
+    }
+
+    /**
+     * 读取文件内容
+     * @param clusterNum: data 区cluster 号
+     * */
+    string readFileContent(const int clusterNum) {
+        char *str = new char[SecPerClus * BytsPerSec];
+        int startByte = fetchDataBaseInByte() + (clusterNum - 2) * SecPerClus * BytsPerSec;
+        fseek(fat12_ptr, startByte, SEEK_SET);
+        fread(str, 1, SecPerClus * BytsPerSec, fat12_ptr);
+        return string(str);
+    }
 
 private:
     void fillBPB(FILE *fat12, struct BPB *bpb_ptr);
@@ -103,9 +232,12 @@ private:
     int getNextFatValue(FILE *fat12, int num);
 
 
-    void printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr);
+    void handleRoot(FILE *fat12, struct RootEntry *rootEntry_ptr);
 
-
+    /**
+     * 获取root dic的起始位置
+     * 以byte为单位
+     * */
     int fetchRootDicBaseInByte() {
         return (RsvdSecCnt + NumFATs * FATSz) * BytsPerSec;
     }
@@ -119,6 +251,15 @@ private:
         return BytsPerSec *
                (RsvdSecCnt + FATSz * NumFATs +
                 (RootEntCnt * 32 + BytsPerSec - 1) / BytsPerSec);
+    }
+
+    /**
+     * 获取data区内部某一个cluster的起始位置
+     * 以byte为单位
+     *
+     * */
+    int fetchClusterDataInByte(int cluster) {
+        return (RsvdSecCnt + NumFATs * FATSz) * BytsPerSec + (cluster - 2) * (SecPerClus * BytsPerSec);
     }
 
     bool isValidPath(const char *path, const int maxLen) const {
@@ -135,4 +276,6 @@ private:
     }
 
     void validPathTransform(const RootEntry &re, char tempName[12], const bool isDic = false) const;
+
+
 };

@@ -112,11 +112,12 @@ void FAT::printChildren(FILE *fat12, string directory, int startClus) {
             loop += 32;
         }
         free(str);
+        //来到下一个位置
         currentClus = value;
     }
 }
 
-void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
+void FAT::handleRoot(FILE *fat12, struct RootEntry *rootEntry_ptr) {
     int base = fetchRootDicBaseInByte(); //根目录首字节的偏移数
     int check;
     char realName[12];  //暂存将空格替换成点后的文件名
@@ -135,6 +136,9 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
             //输出文件
             validPathTransform(*rootEntry_ptr, realName);
             fileList.emplace_back(string(realName));
+            //进行单个文件信息读取
+            cout << readFileContent(rootEntry_ptr->DIR_FstClus) << endl;
+
         } else {
             //输出目录及子文件
             validPathTransform(*rootEntry_ptr, realName, true);
@@ -156,17 +160,29 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
 }
 
 void FAT::validPathTransform(const RootEntry &re, char tempName[12], const bool isDic) const {
-    int tempLong = -1;
-    for (int k = 0; k < 11; k++) {
-        if (re.DIR_Name[k] != ' ') {
-            tempName[++tempLong] = re.DIR_Name[k];
-        } else {
-            if (!isDic)
-                tempName[++tempLong] = '.';
-            while (re.DIR_Name[k] == ' ') k++;
-            k--;
+    if (re.ext[0] == ' ') {
+        int tempLong = -1;
+        for (char k : re.DIR_Name) {
+            if (k != ' ') {
+                tempName[++tempLong] = k;
+            } else {
+                break;
+            }
         }
+        tempName[++tempLong] = '\0';  //到此为止，把文件名提取出来放到tempName里
+    } else {
+        int tempLong = -1;
+        for (int k = 0; k < 11; k++) {
+            if (re.DIR_Name[k] != ' ') {
+                tempName[++tempLong] = re.DIR_Name[k];
+            } else {
+                if (!isDic)
+                    tempName[++tempLong] = '.';
+                while (re.DIR_Name[k] == ' ') k++;
+                k--;
+            }
+        }
+        tempName[++tempLong] = '\0';  //到此为止，把文件名提取出来放到tempName里
     }
-    tempLong++;
-    tempName[tempLong] = '\0';  //到此为止，把文件名提取出来放到tempName里
+
 }

@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/Users/mac/Documents/repos/OS-2019/FAT/fat/fat.cpp
+fat.h
+/Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
+
 /Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
 cstdio
 -
@@ -15,8 +19,10 @@ cstring
 -
 cstdint
 -
-
-/Users/mac/Documents/repos/OS-2019/FAT/main.cpp
-fat/fat.h
-/Users/mac/Documents/repos/OS-2019/FAT/fat/fat.h
+cctype
+-
+iostream
+-
+vector
+-
 

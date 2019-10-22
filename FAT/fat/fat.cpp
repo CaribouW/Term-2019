@@ -3,11 +3,12 @@
 //
 
 #include "fat.h"
-#include <cctype>
 
-//判定是否是有效字符 数字、字母、空格
-static bool isValidPath(const char ch) {
-    return isalnum(ch) || isblank(ch);
+static void str_cp(char *s1, const char *s2) {
+    int n = strlen(s2);
+    for (int i = 0; i < n; ++i) {
+        s1[i] = s2[i];
+    }
 }
 
 void FAT::fillBPB(FILE *fat12, struct BPB *bpb_ptr) {
@@ -117,7 +118,8 @@ void FAT::printChildren(FILE *fat12, char *directory, int startClus) {
             //过滤非目标文件
             int pathInvalid = 0;
             for (int j = loop; j < loop + 11; j++) {
-                if (!isValidPath(content[j])) {
+                char ch = content[j];
+                if (!((isalnum(ch) || isblank(ch)))) {
                     pathInvalid = 1;    //非英文及数字、空格
                     break;
                 }
@@ -175,7 +177,7 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
         //过滤非目标文件
         int boolean = 0;
         for (char ch : rootEntry_ptr->DIR_Name) {
-            if (!isValidPath(ch)) {
+            if (!(isalnum(ch) || isblank(ch))) {
                 boolean = 1;    //非英文及数字、空格
                 break;
             }
@@ -201,21 +203,24 @@ void FAT::printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr) {
             //输出文件
             printf("%s\n", realName);
         } else {
-            //目录
-            int tempLong = -1;
-            for (char k : rootEntry_ptr->DIR_Name) {
-                if (k != ' ') {
-                    tempLong++;
-                    realName[tempLong] = k;
-                } else {
-                    tempLong++;
-                    realName[tempLong] = '\0';
-                    break;
-                }
-            }   //到此为止，把目录名提取出来放到了realName
-
             //输出目录及子文件
+            validPathTransform(*rootEntry_ptr, realName);
             printChildren(fat12, realName, rootEntry_ptr->DIR_FstClus);
         }
     }
+}
+
+void FAT::validPathTransform(const RootEntry &re, char tempName[12]) const {
+    int tempLong = -1;
+    for (int k = 0; k < 11; k++) {
+        if (re.DIR_Name[k] != ' ') {
+            tempName[++tempLong] = re.DIR_Name[k];
+        } else {
+            tempName[++tempLong] = '.';
+            while (re.DIR_Name[k] == ' ') k++;
+            k--;
+        }
+    }
+    tempLong++;
+    tempName[tempLong] = '\0';  //到此为止，把文件名提取出来放到tempName里
 }

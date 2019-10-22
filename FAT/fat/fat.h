@@ -2,6 +2,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdint>
+#include <cctype>
+#include <iostream>
+#include <vector>
 //data sector 从33 开始, 之前root dictory 占用了14 sectors
 #pragma pack (1) /*指定按1字节对齐*/
 
@@ -82,7 +85,12 @@ public:
         RootEntry *rootEntry_ptr = &rootEntry;
         printFiles(this->fat12_ptr, rootEntry_ptr);
     }
-
+/**
+     * 输出目录下文件
+     * @param directory: 目录名称,仅仅是作为输出的时候的前缀
+     * @param startClus: 开始簇,作为链表形式进行输出
+     * */
+    void printChildren(FILE *fat12, char *directory, int startClus);
 private:
     void fillBPB(FILE *fat12, struct BPB *bpb_ptr);
 
@@ -91,12 +99,6 @@ private:
      * */
     int getNextFatValue(FILE *fat12, int num);
 
-    /**
-     * 输出目录下文件
-     * @param directory: 目录名称,仅仅是作为输出的时候的前缀
-     * @param startClus: 开始簇,作为链表形式进行输出
-     * */
-    void printChildren(FILE *fat12, char *directory, int startClus);
 
     void printFiles(FILE *fat12, struct RootEntry *rootEntry_ptr);
 
@@ -115,4 +117,19 @@ private:
                (RsvdSecCnt + FATSz * NumFATs +
                 (RootEntCnt * 32 + BytsPerSec - 1) / BytsPerSec);
     }
+
+    bool isValidPath(const char *path, const int maxLen) const {
+        if (path[0] == '\0')return false;
+        for (int i = 0; i < maxLen; ++i) {
+            char ch = path[i];
+            if (!(isalnum(ch) || isblank(ch)))return false;
+        }
+        return true;
+    }
+
+    bool isDictory(const uint8_t attrCode) {
+        return (attrCode & 0x10) != 0;
+    }
+
+    void validPathTransform(const RootEntry &re, char string[12]) const;
 };

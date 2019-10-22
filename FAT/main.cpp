@@ -9,7 +9,7 @@ int main() {
     //对于ls /PATH , 那么需要一个函数来实现: 给定entry(可以是dic / file) ,
     //输出这个entry下属的文件+文件夹
     RootEntry e = fat.fetchClusterEntry("DEMO");
-    fat.printPathRecur("", e);
+    fat.printPathRecur("/DEMO", e);
 //    cout << fat.readFileContent(fat.fetchClusterEntry("DEMO/THIRD.TXT").DIR_FstClus);
     return 0;
 }

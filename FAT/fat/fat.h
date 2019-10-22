@@ -111,19 +111,6 @@ public:
         return getNextFatValue(this->fat12_ptr, num);
     }
 
-    void printRootFiles() {
-        RootEntry rootEntry{}; //根目录
-        RootEntry *rootEntry_ptr = &rootEntry;
-        handleRoot(this->fat12_ptr, rootEntry_ptr);
-    }
-
-    /**
-     * 输出目录下文件
-     * @param directory: 目录名称,仅仅是作为输出的时候的前缀
-     * @param startClus: 开始簇,作为链表形式进行输出
-     * */
-    void printChildren(FILE *fat12, string directory, int startClus);
-
     /**
      * 包含递归查询
      * ls /NJU 和 cat a.txt 都会使用到该方法
@@ -239,9 +226,6 @@ public:
 
             //-2是因为两个Reserv
             int startByte = dataBase + (currentClus - 2) * byteInCluster;
-            fseek(fat12_ptr, startByte, SEEK_SET);
-            fread(content, 1, byteInCluster, fat12_ptr);
-
             //解析content中的数据,依次处理各个条目,目录下每个条目结构与根目录下的目录结构相同
             int loop = 0;
             while (loop < byteInCluster) {
@@ -264,12 +248,26 @@ public:
         }
         //空dic
         if (0 == entries.size()) {
-
+            cout << ".\t..\n";
+            return;
         } else {
+            vector<RootEntry> dicList;
+            cout << pre + "/:\n";
             for (const auto entry:entries) {
                 char tmpStr[12];
+                //如果是dic，那么就递归调用print
                 validPathTransform(entry, tmpStr);
-                cout << tmpStr << endl;
+                if (tmpStr[0] != '.' && isDictory(entry.DIR_Attr))
+                    dicList.emplace_back(entry);
+                cout << tmpStr << '\t';
+            }
+            cout << endl;
+            //继续输出
+            for (const auto dicEntry:dicList) {
+                char tmpStr[12];
+                //如果是dic，那么就递归调用print
+                validPathTransform(dicEntry, tmpStr);
+                printPathRecur(pre + "/" + tmpStr, dicEntry);
             }
         }
     }
@@ -293,9 +291,6 @@ private:
      * 根据FAT表链表式的存储方式, 根据当前value (以sector为单位) 来获取下一个value (以sector为单位)
      * */
     int getNextFatValue(FILE *fat12, int num);
-
-
-    void handleRoot(FILE *fat12, struct RootEntry *rootEntry_ptr);
 
     /**
      * 获取root dic的起始位置
@@ -329,7 +324,7 @@ private:
         if (path[0] == '\0')return false;
         for (int i = 0; i < maxLen; ++i) {
             char ch = path[i];
-            if (!(isalnum(ch) || isblank(ch)))return false;
+            if (!(isalnum(ch) || isblank(ch) || ch == '.'))return false;
         }
         return true;
     }

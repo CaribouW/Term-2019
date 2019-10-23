@@ -1,1 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/c++  -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/FAT.dir/my_print.asm.o CMakeFiles/FAT.dir/main.cpp.o CMakeFiles/FAT.dir/engine/InstrEngine.cpp.o CMakeFiles/FAT.dir/fatFile/fat.cpp.o  -o FAT 

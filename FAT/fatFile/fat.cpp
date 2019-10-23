@@ -198,11 +198,12 @@ void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
 
         //输出前缀
         printf("%s/:\n", (char *) pre.c_str());
-        printf(".  ..  ");
+        printf("\033[31m.  ..  \033[0m");
         //sub[0]为diclist, sub[1]为fileList
         for (const auto e:sub[0]) {
             validPathTransform(e, name);
-            printf("%s/%s  ", (char *) pre.c_str(), name);
+            printf("\033[31m%s/%s  \033[0m", (char *) pre.c_str(), name);
+//            printf("%s/%s  ", (char *) pre.c_str(), name);
         }
         for (const auto e:sub[1]) {
             validPathTransform(e, name);
@@ -227,12 +228,12 @@ void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
         auto sub = fetchPathSolution(entry);
         //输出前缀
         printf("%s/ %lu %lu:\n", (char *) pre.c_str(), sub[0].size(), sub[1].size());
-        printf(".\n..\n");
+        printf("\033[31m.\n..\033[0m\n");
         for (const auto e:sub[0]) {
             //dic
             validPathTransform(e, name);
             auto lists = fetchPathSolution(e);
-            printf("%s/%s  %lu %lu\n", (char *) pre.c_str(), name, lists[0].size(), lists[1].size());
+            printf("\033[31m%s/%s\033[0m  %lu %lu\n", (char *) pre.c_str(), name, lists[0].size(), lists[1].size());
         }
         for (const auto e:sub[1]) {
             validPathTransform(e, name);
@@ -277,7 +278,7 @@ void FAT::printRoot(bool isDetail) {
         }
         for (int i = 0; i < dicList.size(); ++i) {
             validPathTransform(dicList[i], realName);
-            printf("%s  ", realName);
+            printf("\033[31m%s  \033[0m", realName);
         }
         printf("\n");
         for (int i = 0; i < dicList.size(); ++i) {
@@ -298,7 +299,7 @@ void FAT::printRoot(bool isDetail) {
             validPathTransform(dicList[i], realName);
             //根据realName获取vector
             auto lists = fetchPathSolution(fileList[i]);
-            printf("%s  %lu %lu\n", realName, lists[0].size(), lists[1].size());
+            printf("\033[31m%s  \033[0m%lu %lu\n", realName, lists[0].size(), lists[1].size());
         }
         //递归
         for (int i = 0; i < dicList.size(); ++i) {

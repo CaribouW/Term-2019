@@ -7,8 +7,16 @@
 #include <vector>
 //data sector 从33 开始, 之前root dictory 占用了14 sectors
 #pragma pack (1) /*指定按1字节对齐*/
+
+
+#ifdef ENABLE_ASM
+#define printf print
+extern "C" int print(char *, ...);
+#endif
+
 using namespace std;
 
+//            printf("\033[31m%s  \033[0m", realName);
 typedef unsigned char u8;//1字节
 typedef unsigned short u16;//2字节
 typedef unsigned int u32; //4字节

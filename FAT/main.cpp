@@ -15,52 +15,50 @@ static auto ls_detail_file = regex("(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+)|"
                                    "(ls[\\s][/0-9a-zA-Z\\.]+([\\s][\\-][l]+)+)|"
                                    "(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+([\\s][\\-][l]+)+)");
 
-extern "C" int add(int a, int b);
 
 int main() {
     //文件引用
-    cout << add(3, 4) << endl;
-//    printf("Command begin\nread from {test.img} file\n");
-//    InstrEngine engine("test.img");
-//    char *input = new char[1024];
-//    printf("> ");
-//    cin.getline(input, 1024);
-//    string line = string(input);
-//    while (line != "q") {
-//        //预先删除多余的空格
-//        line = regex_replace(line, regex("\\s+"), " ");
-//        line = trim(line);
-//        vector<string> comList = split(line, " ");
-//        //ls stage
-//        if (regex_match(line, ls_default)) {
-//            engine.execute_ls("/");
-//        } else if (regex_match(line, ls_detail_default)) {
-//            engine.execute_ls("/", true);
-//        } else if (regex_match(line, cat_pattern)) {
-//            //去除首位的 /
-//            string path = regex_replace(comList[1], regex("^/|/$"), "");
-//            engine.execute_cat(path);
-//        } else if (regex_match(line, ls_simple_file)) {
-//            //ls <file>
-//            string path = regex_replace(comList[1], regex("^/|/$"), "");
-//            engine.execute_ls(path);
-//        } else if (regex_match(line, ls_detail_file)) {
-//            //ls -l <file>
-//            int index;
-//            for (index = 1; index < comList.size(); ++index) {
-//                if (comList[index][0] != '-')break;
-//            }
-//            string path = regex_replace(comList[index], regex("^/|/$"), "");
-//
-//            engine.execute_ls(path, true);
-//        } else {
-//            printf("**Error:command not legal!\n");
-//        }
-//        printf("> ");
-//        cin.getline(input, 1024);
-//        line = string(input);
-//    }
-//    return 0;
+    printf("Command begin\nread from {test.img} file\n");
+    InstrEngine engine("test.img");
+    char *input = new char[1024];
+    printf("> ");
+    cin.getline(input, 1024);
+    string line = string(input);
+    while (line != "q") {
+        //预先删除多余的空格
+        line = regex_replace(line, regex("\\s+"), " ");
+        line = trim(line);
+        vector<string> comList = split(line, " ");
+        //ls stage
+        if (regex_match(line, ls_default)) {
+            engine.execute_ls("/");
+        } else if (regex_match(line, ls_detail_default)) {
+            engine.execute_ls("/", true);
+        } else if (regex_match(line, cat_pattern)) {
+            //去除首位的 /
+            string path = regex_replace(comList[1], regex("^/|/$"), "");
+            engine.execute_cat(path);
+        } else if (regex_match(line, ls_simple_file)) {
+            //ls <file>
+            string path = regex_replace(comList[1], regex("^/|/$"), "");
+            engine.execute_ls(path);
+        } else if (regex_match(line, ls_detail_file)) {
+            //ls -l <file>
+            int index;
+            for (index = 1; index < comList.size(); ++index) {
+                if (comList[index][0] != '-')break;
+            }
+            string path = regex_replace(comList[index], regex("^/|/$"), "");
+
+            engine.execute_ls(path, true);
+        } else {
+            printf("**Error:command not legal!\n");
+        }
+        printf("> ");
+        cin.getline(input, 1024);
+        line = string(input);
+    }
+    return 0;
 }
 
 

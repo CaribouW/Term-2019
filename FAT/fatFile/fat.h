@@ -6,49 +6,12 @@
 #include <iostream>
 #include <vector>
 //data sector 从33 开始, 之前root dictory 占用了14 sectors
-#pragma pack (1) /*指定按1字节对齐*/
 
+#pragma pack (push, 1) /*指定按1字节对齐*/
 
-#ifdef ENABLE_ASM
-#define printf print
-extern "C" int print(char *, ...);
-#endif
-
-using namespace std;
-
-//            printf("\033[31m%s  \033[0m", realName);
 typedef unsigned char u8;//1字节
 typedef unsigned short u16;//2字节
 typedef unsigned int u32; //4字节
-//字符串分割函数
-static std::vector<std::string> split(std::string str, std::string pattern) {
-    std::string::size_type pos;
-    std::vector<std::string> result;
-    str += pattern;//扩展字符串以方便操作
-    int size = str.size();
-
-    for (int i = 0; i < size; i++) {
-        pos = str.find(pattern, i);
-        if (pos < size) {
-            std::string s = str.substr(i, pos - i);
-            result.push_back(s);
-            i = pos + pattern.size() - 1;
-        }
-    }
-    return result;
-}
-
-static std::string trim(std::string &s) {
-    if (s.empty()) {
-        return s;
-    }
-
-    s.erase(0, s.find_first_not_of(" "));
-    s.erase(s.find_last_not_of(" ") + 1);
-    return s;
-}
-//(physical sector number) = 33 + (FAT entry number) - 2
-
 //前11Bytes ignore
 //偏移11个字节
 struct BPB {
@@ -83,9 +46,51 @@ struct RootEntry {
     u32 DIR_FileSize;   //File size大小 Bytes
 
     RootEntry() {
-        this->DIR_FstClus = -1;
+        this->DIR_FstClus = 0;
     }
 };
+
+#pragma pack (pop) /*指定按1字节对齐*/
+
+#ifdef ENABLE_ASM
+#define printf print
+extern "C" int print(char *, ...);
+#endif
+
+using namespace std;
+
+static const char *FILE_NOT_FOUND = "**Error File or Directory not exist!";
+static const char *COMMAND_ILLEGAL = "**Error Command not Legal!";
+
+//字符串分割函数
+static std::vector<std::string> split(std::string str, std::string pattern) {
+    std::string::size_type pos;
+    std::vector<std::string> result;
+    str += pattern;//扩展字符串以方便操作
+    int size = str.size();
+
+    for (int i = 0; i < size; i++) {
+        pos = str.find(pattern, i);
+        if (pos < size) {
+            std::string s = str.substr(i, pos - i);
+            result.push_back(s);
+            i = pos + pattern.size() - 1;
+        }
+    }
+    return result;
+}
+
+static std::string trim(std::string &s) {
+    if (s.empty()) {
+        return s;
+    }
+
+    s.erase(0, s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+}
+//(physical sector number) = 33 + (FAT entry number) - 2
+
 
 class FAT {
 public:

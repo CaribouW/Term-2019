@@ -18,8 +18,13 @@ static auto ls_detail_file = regex("(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+)|"
 
 int main() {
     //文件引用
-    printf("Command begin\nread from {test.img} file\n");
-    InstrEngine engine("test.img");
+    printf("Command begin\n");
+    printf("Please give the img path: ");
+    char *path = new char[1024];
+    cin.getline(path, 1024);
+    printf("Ok. Now you could read the path in the image%s\n", path);
+    InstrEngine engine(path);
+    delete[] path;
     char *input = new char[1024];
     printf("> ");
     cin.getline(input, 1024);
@@ -52,12 +57,14 @@ int main() {
 
             engine.execute_ls(path, true);
         } else {
-            printf("**Error:command not legal!\n");
+            printf("%s\n", COMMAND_ILLEGAL);
         }
         printf("> ");
         cin.getline(input, 1024);
         line = string(input);
     }
+    free(input);
+    printf("Good bye!\n");
     return 0;
 }
 

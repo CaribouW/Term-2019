@@ -5,7 +5,7 @@
 #ifndef FAT_INSTRENGINE_H
 #define FAT_INSTRENGINE_H
 
-#include "../fat/fat.h"
+#include "../fatFile/fat.h"
 
 //负责控制台指令的执行
 class InstrEngine {

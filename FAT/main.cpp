@@ -14,7 +14,11 @@ static auto ls_simple_file = regex("ls[\\s][/0-9a-zA-Z\\.]+");
 static auto ls_detail_file = regex("(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+)|"
                                    "(ls[\\s][/0-9a-zA-Z\\.]+([\\s][\\-][l]+)+)|"
                                    "(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+([\\s][\\-][l]+)+)");
-
+//异常处理内容
+//包括 : 文件 or 文件夹不存在
+//  指令格式出错
+//      1. 指令本身格式不规范---正则
+//      2. 即使正确格式 : cat 后面不可以跟文件夹 / ls 后面不可以跟文件
 
 int main() {
     //文件引用
@@ -49,13 +53,15 @@ int main() {
             engine.execute_ls(path);
         } else if (regex_match(line, ls_detail_file)) {
             //ls -l <file>
-            int index;
+            uint32_t index;
             for (index = 1; index < comList.size(); ++index) {
                 if (comList[index][0] != '-')break;
             }
             string path = regex_replace(comList[index], regex("^/|/$"), "");
 
             engine.execute_ls(path, true);
+        } else if (line == "clear") {
+            system("clear");
         } else {
             printf("%s\n", COMMAND_ILLEGAL);
         }

@@ -40,6 +40,9 @@ public:
         if (0 == re.DIR_FstClus) {
             printf("%s\n", FILE_NOT_FOUND);
             return;
+        } else if (fat.isDictory(re.DIR_Attr)) {
+            printf("**Error: The target is not a file name.You should give a valid file path!\n");
+            return;
         }
         //while (value < 0xFF8) 如果文件容量过大，那么就分到多个sec里面
         string content = fat.readFileContent(re);

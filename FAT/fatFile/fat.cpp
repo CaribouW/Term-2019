@@ -185,12 +185,12 @@ RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus) {
 }
 
 void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
+    const char *notDicErr = "**Error: The target is not a directory.You should give a valid directory path!";
     if (!isDetail) {
         //如果是单个文件文件
         char name[12];
         if (!isDictory(entry.DIR_Attr)) {
-            validPathTransform(entry, name);
-            printf("%s/%s  ", (char *) pre.c_str(), name);
+            printf("%s\n", notDicErr);
             return;
         }
         //文件夹
@@ -203,7 +203,6 @@ void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
         for (const auto e:sub[0]) {
             validPathTransform(e, name);
             printf("\033[31m%s/%s  \033[0m", (char *) pre.c_str(), name);
-//            printf("%s/%s  ", (char *) pre.c_str(), name);
         }
         for (const auto e:sub[1]) {
             validPathTransform(e, name);
@@ -215,13 +214,12 @@ void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
             validPathTransform(e, name);
             printPathRecur(pre + '/' + name, e);
         }
-        printf("\n");
+//        printf("\n");
     } else {
         char name[12];
         //单个文件，输出size
         if (!isDictory(entry.DIR_Attr)) {
-            validPathTransform(entry, name);
-            printf("%s/%s  %u", (char *) pre.c_str(), name, entry.DIR_FileSize);
+            printf("%s\n", notDicErr);
             return;
         }
         //文件夹
@@ -286,7 +284,7 @@ void FAT::printRoot(bool isDetail) {
             string pre = "/" + string(realName);
             printPathRecur(pre, dicList[i]);
         }
-        printf("\n");
+//        printf("\n");
     } else {
         int dicNum = dicList.size(), fileNum = fileList.size();
         printf("/ %d %d:\n", dicNum, fileNum);

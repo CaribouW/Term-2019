@@ -245,6 +245,10 @@ public:
         return getNextFatValue(fat12_ptr, num);
     }
 
+    bool isDictory(const uint8_t attrCode) {
+        return (attrCode & 0x10) != 0;
+    }
+
 private:
     void fillBPB(FILE *fat12, struct BPB *bpb_ptr);
 
@@ -290,9 +294,6 @@ private:
         return true;
     }
 
-    bool isDictory(const uint8_t attrCode) {
-        return (attrCode & 0x10) != 0;
-    }
 
     void validPathTransform(const RootEntry &re, char tempName[12]) const;
 

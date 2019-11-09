@@ -5,7 +5,7 @@ enable_language(ASM_NASM)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
 set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS}  --prefix _")
 #是否使用nasm
-#add_definitions(-D ENABLE_ASM)
+add_definitions(-D ENABLE_ASM)
 project(FAT)
 add_executable(FAT
         my_print.asm

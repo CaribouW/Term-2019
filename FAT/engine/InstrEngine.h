@@ -11,7 +11,7 @@
 class InstrEngine {
 public:
 
-    InstrEngine(char *s) {
+    InstrEngine(const char *s) {
         fat = FAT(s);
     }
 

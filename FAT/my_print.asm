@@ -1,3 +1,11 @@
+section .data
+color_blue:    db 1Bh, '[34;1m', 0 ;蓝色
+.len           equ $ - color_blue
+color_red:     db 1Bh, '[31;1m', 0 ;红色
+.len           equ $ - color_red
+defaultColor:  db 1bh,'[0m'        ;默认颜色
+.len           equ $ - defaultColor
+
         global  print
         extern  printf
 

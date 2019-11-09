@@ -21,12 +21,9 @@ static auto ls_detail_file = regex("(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+)|"
 //      2. 即使正确格式 : cat 后面不可以跟文件夹 / ls 后面不可以跟文件
 
 int main() {
+    const char *path = new char[1024]{"test.img"};
     //文件引用
     printf("Command begin\n");
-    printf("Please give the img path: ");
-    char *path = new char[1024];
-    cin.getline(path, 1024);
-    printf("Ok. Now you could read the path in the image%s\n", path);
     InstrEngine engine(path);
     delete[] path;
     char *input = new char[1024];

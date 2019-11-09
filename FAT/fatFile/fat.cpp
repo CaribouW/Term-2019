@@ -125,7 +125,8 @@ RootEntry FAT::fetchClusterEntry(const char *path) {
         //是文件
         validPathTransform(*rootEntry_ptr, realName);
         //根目录下的file
-        if (target == realName && strings.size() == 1)
+        if (target != realName)continue;
+        if (strings.size() == 1)
             return *rootEntry_ptr;
             //属于子文件夹查询
         else if (strings.size() > 1) {

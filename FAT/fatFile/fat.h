@@ -5,10 +5,11 @@
 #include <cctype>
 #include <iostream>
 #include <vector>
+#include<sstream>
 //data sector 从33 开始, 之前root dictory 占用了14 sectors
 
 #pragma pack (push, 1) /*指定按1字节对齐*/
-
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 typedef unsigned char u8;//1字节
 typedef unsigned short u16;//2字节
 typedef unsigned int u32; //4字节
@@ -51,16 +52,21 @@ struct RootEntry {
 };
 
 #pragma pack (pop) /*指定按1字节对齐*/
-
+// 宏定义来确定是否使用nasm
 #ifdef ENABLE_ASM
-#define printf print
-extern "C" int print(char *, ...);
+#define printf nasmPrint
+extern "C" int mPrint(const char *, int);
+
+static void nasmPrint(const char *input) {
+    mPrint(input, strlen(input));
+}
+
 #endif
 
 using namespace std;
 
-static const char *FILE_NOT_FOUND = "**Error File or Directory not exist!";
-static const char *COMMAND_ILLEGAL = "**Error Command not Legal!";
+static const char *FILE_NOT_FOUND = "**Error File or Directory not exist!\n";
+static const char *COMMAND_ILLEGAL = "**Error Command not Legal!\n";
 
 //字符串分割函数
 static std::vector<std::string> split(std::string str, std::string pattern) {
@@ -109,7 +115,7 @@ public:
 
     FAT() {}
 
-    FAT(char *str) {
+    FAT(const char *str) {
         FILE *pFile;
         pFile = fopen(str, "rb");
         this->fat12_ptr = pFile;

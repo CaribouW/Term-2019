@@ -11,7 +11,7 @@
 class InstrEngine {
 public:
 
-    InstrEngine(char *s) {
+    InstrEngine(const char *s) {
         fat = FAT(s);
     }
 
@@ -25,7 +25,7 @@ public:
         else {
             RootEntry re = fat.fetchClusterEntry((char *) path.c_str());
             if (0 == re.DIR_FstClus) {
-                printf("%s\n", FILE_NOT_FOUND);
+                printf(FILE_NOT_FOUND);
                 return;
             }
             fat.printPathRecur(path, re, isDetail);
@@ -38,7 +38,7 @@ public:
     void execute_cat(string path) {
         RootEntry re = fat.fetchClusterEntry((char *) path.c_str());
         if (0 == re.DIR_FstClus) {
-            printf("%s\n", FILE_NOT_FOUND);
+            printf(FILE_NOT_FOUND);
             return;
         } else if (fat.isDictory(re.DIR_Attr)) {
             printf("**Error: The target is not a file name.You should give a valid file path!\n");
@@ -47,7 +47,7 @@ public:
         //while (value < 0xFF8) 如果文件容量过大，那么就分到多个sec里面
         string content = fat.readFileContent(re);
         //print
-        printf("%s\n", (char *) content.c_str());
+        printf(content.c_str());
     }
 
 private:

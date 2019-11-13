@@ -19,7 +19,8 @@ static auto ls_detail_file = regex("(ls([\\s][\\-][l]+)+[\\s][/0-9a-zA-Z\\.]+)|"
 //  指令格式出错
 //      1. 指令本身格式不规范---正则
 //      2. 即使正确格式 : cat 后面不可以跟文件夹 / ls 后面不可以跟文件
-
+//#define TEST
+#ifndef TEST
 int main() {
     const char *path = new char[1024]{"ref.img"};
     //文件引用
@@ -60,7 +61,7 @@ int main() {
         } else if (line == "clear") {
             system("clear");
         } else {
-            printf("%s\n", COMMAND_ILLEGAL);
+            printf(COMMAND_ILLEGAL);
         }
         printf("> ");
         cin.getline(input, 1024);
@@ -70,6 +71,15 @@ int main() {
     printf("Good bye!\n");
     return 0;
 }
+#endif
+
+#ifdef TEST
+
+int main() {
+    printf("\033[31m.\n..\033[0m\n");
+}
+
+#endif
 
 
 

@@ -4,6 +4,9 @@
 
 #include "fat.h"
 
+static stringstream ss;
+
+
 static void str_cp(char *s1, const char *s2) {
     int n = strlen(s2);
     for (int i = 0; i < n; ++i) {
@@ -186,28 +189,37 @@ RootEntry FAT::fetchClusterEntry(vector<string> strings, int startClus) {
 }
 
 void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
-    const char *notDicErr = "**Error: The target is not a directory.You should give a valid directory path!";
+    const char *notDicErr = "**Error: The target is not a directory.You should give a valid directory path!\n";
     if (!isDetail) {
         //如果是单个文件文件
         char name[12];
         if (!isDictory(entry.DIR_Attr)) {
-            printf("%s\n", notDicErr);
+            printf(notDicErr);
             return;
         }
         //文件夹
         auto sub = fetchPathSolution(entry);
 
         //输出前缀
-        printf("%s/:\n", (char *) pre.c_str());
+//        printf("%s/:\n", (char *) pre.c_str());
+        ss << pre << "/:\n";
+        printf(ss.str().c_str());
+        ss.str("");
         printf("\033[31m.  ..  \033[0m");
         //sub[0]为diclist, sub[1]为fileList
         for (const auto e:sub[0]) {
             validPathTransform(e, name);
-            printf("\033[31m%s/%s  \033[0m", (char *) pre.c_str(), name);
+            ss << "\033[31m" << pre << '/' << name << "  \033[0m";
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("\033[31m%s/%s  \033[0m", (char *) pre.c_str(), name);
         }
         for (const auto e:sub[1]) {
             validPathTransform(e, name);
-            printf("%s/%s  ", (char *) pre.c_str(), name);
+            ss << pre << '/' << name << "  ";
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("%s/%s  ", (char *) pre.c_str(), name);
         }
         printf("\n");
         //递归
@@ -220,23 +232,33 @@ void FAT::printPathRecur(string pre, const RootEntry &entry, bool isDetail) {
         char name[12];
         //单个文件，输出size
         if (!isDictory(entry.DIR_Attr)) {
-            printf("%s\n", notDicErr);
+            printf(notDicErr);
             return;
         }
         //文件夹
         auto sub = fetchPathSolution(entry);
         //输出前缀
-        printf("%s/ %lu %lu:\n", (char *) pre.c_str(), sub[0].size(), sub[1].size());
+        ss << pre << "/ " << sub[0].size() << ' ' << sub[1].size() << ":\n";
+        printf(ss.str().c_str());
+        ss.str("");
+//        printf("%s/ %lu %lu:\n", (char *) pre.c_str(), sub[0].size(), sub[1].size());
         printf("\033[31m.\n..\033[0m\n");
         for (const auto e:sub[0]) {
             //dic
             validPathTransform(e, name);
             auto lists = fetchPathSolution(e);
-            printf("\033[31m%s/%s\033[0m  %lu %lu\n", (char *) pre.c_str(), name, lists[0].size(), lists[1].size());
+            ss << "\033[31m" << pre << '/' << name << "\033[0m" << "  " << lists[0].size() << ' '
+               << lists[1].size() << '\n';
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("\033[31m%s/%s\033[0m  %lu %lu\n", (char *) pre.c_str(), name, lists[0].size(), lists[1].size());
         }
         for (const auto e:sub[1]) {
             validPathTransform(e, name);
-            printf("%s/%s  %u\n", (char *) pre.c_str(), name, e.DIR_FileSize);
+            ss << pre << '/' << name << "  " << e.DIR_FileSize << '\n';
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("%s/%s  %u\n", (char *) pre.c_str(), name, e.DIR_FileSize);
         }
         //递归
         for (const auto e:sub[0]) {
@@ -273,11 +295,17 @@ void FAT::printRoot(bool isDetail) {
         printf("/:\n");
         for (int i = 0; i < fileList.size(); ++i) {
             validPathTransform(fileList[i], realName);
-            printf("%s  ", realName);
+            ss << realName << "  ";
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("%s  ", realName);
         }
         for (int i = 0; i < dicList.size(); ++i) {
             validPathTransform(dicList[i], realName);
-            printf("\033[31m%s  \033[0m", realName);
+            ss << "\033[31m" << realName << "  \033[0m";
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("\033[31m%s  \033[0m", realName);
         }
         printf("\n");
         for (int i = 0; i < dicList.size(); ++i) {
@@ -288,17 +316,26 @@ void FAT::printRoot(bool isDetail) {
 //        printf("\n");
     } else {
         int dicNum = dicList.size(), fileNum = fileList.size();
-        printf("/ %d %d:\n", dicNum, fileNum);
+        ss << "/ " << dicNum << ' ' << fileNum << ":\n";
+        printf(ss.str().c_str());
+        ss.str("");
+//        printf("/ %d %d:\n", dicNum, fileNum);
         //每一个dic都需要计算
         for (int i = 0; i < fileList.size(); ++i) {
             validPathTransform(fileList[i], realName);
-            printf("%s  %u\n", realName, fileList[i].DIR_FileSize);
+            ss << realName << "  " << fileList[i].DIR_FileSize << '\n';
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("%s  %u\n", realName, fileList[i].DIR_FileSize);
         }
         for (int i = 0; i < dicList.size(); ++i) {
             validPathTransform(dicList[i], realName);
             //根据realName获取vector
-            auto lists = fetchPathSolution(fileList[i]);
-            printf("\033[31m%s  \033[0m%lu %lu\n", realName, lists[0].size(), lists[1].size());
+            auto lists = fetchPathSolution(dicList[i]);
+            ss << "\033[31m" << realName << "  \033[0m" << lists[0].size() << ' ' << lists[1].size() << '\n';
+            printf(ss.str().c_str());
+            ss.str("");
+//            printf("\033[31m%s  \033[0m%lu %lu\n", realName, lists[0].size(), lists[1].size());
         }
         //递归
         for (int i = 0; i < dicList.size(); ++i) {

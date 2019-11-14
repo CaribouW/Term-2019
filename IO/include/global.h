@@ -34,3 +34,5 @@ extern	TTY		tty_table[];
 extern  CONSOLE         console_table[];
 
 
+//add the ESC mode
+extern  int         ESC_MODE;

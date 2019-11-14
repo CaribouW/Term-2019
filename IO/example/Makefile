@@ -17,8 +17,8 @@ CC		= gcc -m32
 LD		= ld -m elf_i386
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf32
-CFLAGS		= -I include/ -c -fno-builtin  -fno-stack-protector
-LDFLAGS		= -s -Ttext $(ENTRYPOINT)
+CFLAGS		= -I include/ -c -fno-builtin  -fno-stack-protector -m32
+LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
 # This Program

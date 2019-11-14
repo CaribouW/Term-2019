@@ -35,4 +35,4 @@ extern  CONSOLE         console_table[];
 
 
 //add the ESC mode
-extern  int         ESC_MODE;
+EXTERN  int         ESC_MODE;

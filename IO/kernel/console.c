@@ -189,3 +189,20 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction)
 	set_cursor(p_con->cursor);
 }
 
+
+/*====================================================
+empty console contents
+===========================*/
+PUBLIC void empty(CONSOLE* p_con)
+{
+    p_con->cursor = p_con->original_addr;
+    u8* p_vmem = (u8*)(V_MEM_BASE + p_con->cursor * 2);
+    while (p_con->cursor < p_con->original_addr + p_con->v_mem_limit - 1) {
+        *p_vmem++ = '\0';
+        *p_vmem++ = DEFAULT_CHAR_COLOR;
+        p_con->cursor ++;
+    }
+    p_con->cursor = p_con->original_addr;
+    p_con->current_start_addr = p_con->original_addr;
+    flush(p_con);
+}

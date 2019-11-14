@@ -15,6 +15,9 @@
 #include "global.h"
 #include "proto.h"
 
+PRIVATE const int       LIMITATION = 20000;        //TIME_COUNTER <= LIMITATION
+PRIVATE int             TIME_COUNTER;
+PRIVATE int             IS_COUNTING;
 
 /*======================================================================*
                            clock_handler
@@ -23,6 +26,18 @@ PUBLIC void clock_handler(int irq)
 {
 	ticks++;
 	p_proc_ready->ticks--;
+
+        if(IS_COUNTING == 1){
+                IS_COUNTING = !IS_COUNTING;
+                empty(console_table);
+        }
+        if(ESC_MODE == 0){
+                ++TIME_COUNTER;
+        }
+        if(TIME_COUNTER >= LIMITATION){
+                TIME_COUNTER = 0;
+                empty(console_table);
+        }
 
 	if (k_reenter != 0) {
 		return;
@@ -58,6 +73,10 @@ PUBLIC void init_clock()
 
         put_irq_handler(CLOCK_IRQ, clock_handler);    /* 设定时钟中断处理程序 */
         enable_irq(CLOCK_IRQ);                        /* 让8259A可以接收时钟中断 */
+
+        //start to count
+        TIME_COUNTER = 0;
+        IS_COUNTING = 1;
 }
 
 

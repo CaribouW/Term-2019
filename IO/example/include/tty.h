@@ -9,7 +9,7 @@
 #define _ORANGES_TTY_H_
 
 
-#define TTY_IN_BYTES	256	/* tty input queue size */
+#define TTY_IN_BYTES	512	/* tty input queue size */
 
 struct s_console;
 

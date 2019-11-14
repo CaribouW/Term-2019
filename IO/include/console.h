@@ -18,6 +18,7 @@ typedef struct s_console
 	unsigned int	cursor;			/* 当前光标位置 */
 }CONSOLE;
 
+
 #define SCR_UP	1	/* scroll forward */
 #define SCR_DN	-1	/* scroll backward */
 
@@ -26,5 +27,9 @@ typedef struct s_console
 
 #define DEFAULT_CHAR_COLOR	0x07	/* 0000 0111 黑底白字 */
 
-
+#define ESC_CHAR_COLOR 0x05  /* 0000 0101 黑底洋红字 */
+#define SPECIAL_CHAR_COLOR 0x00  /* 0000 0000 黑底黑字 */
+#define TEST_COLOR 0x01
+#define CURSOR_COLOR 0x87
+//flages
 #endif /* _ORANGES_CONSOLE_H_ */

@@ -98,5 +98,6 @@
 
 /* system call */
 #define NR_SYS_CALL     1
+#define BLANK		' '
 
 #endif /* _ORANGES_CONST_H_ */

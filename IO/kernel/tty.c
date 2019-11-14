@@ -42,8 +42,8 @@ PUBLIC void task_tty()
 	{
 		for (p_tty = TTY_FIRST; p_tty < TTY_END; p_tty++)
 		{
-			tty_do_read(p_tty);
-			tty_do_write(p_tty);
+			tty_do_read(p_tty);		//if cur console , read from Keyboard
+			tty_do_write(p_tty);	//console output char
 		}
 	}
 }
@@ -55,14 +55,13 @@ PRIVATE void init_tty(TTY *p_tty)
 {
 	//Set default esc
 	ESC_MODE = 0;
-
 	p_tty->inbuf_count = 0;
 	p_tty->p_inbuf_head = p_tty->p_inbuf_tail = p_tty->in_buf;
 	init_screen(p_tty);
 }
 
 /*======================================================================*
-				in_process
+				in_process>>> put the key into tty buffer
  *======================================================================*/
 PUBLIC void in_process(TTY *p_tty, u32 key)
 {
@@ -165,7 +164,7 @@ PRIVATE void tty_do_write(TTY *p_tty)
 		p_tty->p_inbuf_tail++;
 		if (p_tty->p_inbuf_tail == p_tty->in_buf + TTY_IN_BYTES)
 		{
-			p_tty->p_inbuf_tail = p_tty->in_buf;
+			p_tty->p_inbuf_tail = p_tty->in_buf;	//full buf , clean up
 		}
 		p_tty->inbuf_count--;
 

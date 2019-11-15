@@ -32,4 +32,12 @@ typedef struct s_console
 #define TEST_COLOR 0x01
 #define CURSOR_COLOR 0x87
 //flages
+//For ctrl-z data structure
+typedef struct modify_symbol
+{
+	char ch;
+	unsigned int cursor; //The cursor before modifying
+	int is_add;
+} MODIFY;
+#define MODIFY_LIM 1024
 #endif /* _ORANGES_CONSOLE_H_ */

@@ -38,7 +38,10 @@ PRIVATE void esc_out_char(CONSOLE *p_con, char ch);
 PRIVATE void enter_out_char(CONSOLE *p_con, char ch);
 //Helper to put the chars
 PRIVATE void put_ch(CONSOLE *p_con, const char ch); //ch could be '\t' or '\b'
+//reset arr
 
+PRIVATE MODIFY modifies[MODIFY_LIM];
+PRIVATE int modify_index;
 /*======================================================================*
 			   init_screen
  *======================================================================*/
@@ -69,7 +72,7 @@ PUBLIC void init_screen(TTY *p_tty)
 		out_char(p_tty->p_console, '#');
 	}
 
-	esc_begin = 0;
+	esc_begin = modify_index = 0;
 
 	set_cursor(p_tty->p_console->cursor);
 }
@@ -216,13 +219,16 @@ PRIVATE void fill_symbol(u8 *pos, const u8 ch, const u8 color)
 PRIVATE void normal_out_char(CONSOLE *p_con, char ch)
 {
 	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2); //cur
-
+	MODIFY m;
 	switch (ch)
 	{
 	case '\n':
 		//ESC
-
 		fill_symbol(p_vmem, 0x0A, SPECIAL_CHAR_COLOR);
+		m.ch = 0x0A;
+		m.cursor = p_con->cursor;
+		m.is_add = 1;
+
 		if (p_con->cursor < p_con->original_addr +
 								p_con->v_mem_limit - SCREEN_WIDTH)
 		{
@@ -231,6 +237,7 @@ PRIVATE void normal_out_char(CONSOLE *p_con, char ch)
 															SCREEN_WIDTH +
 														1);
 		}
+		modifies[modify_index++ % MODIFY_LIM] = m;
 
 		break;
 	case '\e':
@@ -239,24 +246,74 @@ PRIVATE void normal_out_char(CONSOLE *p_con, char ch)
 		esc_begin_v_mem = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
 		ESC_MODE = 1;
 		break;
-	case '\z':
-		fill_symbol(p_vmem,'B',DEFAULT_CHAR_COLOR);
-		++p_con->cursor;
+	case '\z': //reset pre'
+		if (modify_index <= 0)
+		{
+			modify_index = 0;
+		}
+		else
+		{
+			m = modifies[--modify_index];
+			//if append , we remove from [pre + 1] to end
+			if (m.is_add)
+			{
+				int pre = m.cursor;
+				int end = p_con->cursor;
+				do
+				{
+					u8 *tmp_cursor = (u8 *)(V_MEM_BASE + pre * 2);
+					pre += 2;
+					fill_symbol(tmp_cursor, 0x0, DEFAULT_CHAR_COLOR);
+				} while (pre <= end);
+				p_con->cursor = m.cursor;
+			}
+			//if remove something , we add it back
+			else
+			{
+				put_ch(p_con, m.ch);
+				// u8 *tmp_cursor = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
+				// if (!(m.ch == 0x0 || m.ch == 0x09))
+				// {
+				// 	fill_symbol(tmp_cursor, m.ch, DEFAULT_CHAR_COLOR);
+				// 	p_con->cursor++;
+				// }
+			}
+		}
 		break;
 	case '\b':
+		if (p_con->cursor > p_con->original_addr)
+		{
+			m.is_add = 0;
+			m.cursor = p_con->cursor;
+			u8 *p_vmem = (u8 *)(V_MEM_BASE + (p_con->cursor - 1) * 2); //cur
+			m.ch = *p_vmem;
+			modifies[modify_index++ % MODIFY_LIM] = m;
+			put_ch(p_con, ch);
+		}
+		break;
 	case '\t':
+		m.ch = '\t';
+		m.cursor = p_con->cursor;
+		m.is_add = 1;
 		put_ch(p_con, ch);
+		modifies[modify_index++ % MODIFY_LIM] = m;
 		break;
 	default:
 		if (p_con->cursor <
 			p_con->original_addr + p_con->v_mem_limit - 1)
 		{
+			m.ch = ch;
+			m.cursor = p_con->cursor;
+			m.is_add = 1;
 			fill_symbol(p_vmem, ch, DEFAULT_CHAR_COLOR);
+			modifies[modify_index++ % MODIFY_LIM] = m;
 			p_con->cursor++;
 		}
 		break;
-		break;
 	}
+	//clean up
+	if (modify_index >= MODIFY_LIM)
+		modify_index = 0;
 }
 //ESC mode == 1
 PRIVATE void esc_out_char(CONSOLE *p_con, char ch)
@@ -406,7 +463,7 @@ PRIVATE void put_ch(CONSOLE *p_con, const char ch)
 		if (p_con->cursor <
 			p_con->original_addr + p_con->v_mem_limit - 1)
 		{
-			fill_symbol(p_vmem, ch, ESC_CHAR_COLOR);
+			fill_symbol(p_vmem, ch, DEFAULT_CHAR_COLOR);
 			p_con->cursor++;
 		}
 		break;

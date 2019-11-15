@@ -26,15 +26,19 @@ PRIVATE void set_video_start_addr(u32 addr);
 PRIVATE void flush(CONSOLE *p_con);
 PRIVATE void fill_symbol(u8 *pos, const u8 ch, const u8 color);
 
-PRIVATE u8 *esc_ptr;
-PRIVATE int ESC_ENTER;
+//The location set to the begin of the esc begin position
+PRIVATE u8 *esc_begin_v_mem;
+//Help to compute the length of the esc pattern string
 PRIVATE int esc_begin;
 
 //out char table and functions
 typedef void (*out_char_f)(CONSOLE *p_con, char ch);
-void normal_out_char(CONSOLE *p_con, char ch);
-void esc_out_char(CONSOLE *p_con, char ch);
-void enter_out_char(CONSOLE *p_con, char ch);
+PRIVATE void normal_out_char(CONSOLE *p_con, char ch);
+PRIVATE void esc_out_char(CONSOLE *p_con, char ch);
+PRIVATE void enter_out_char(CONSOLE *p_con, char ch);
+//Helper to put the chars
+PRIVATE void put_ch(CONSOLE *p_con, const char ch); //ch could be '\t' or '\b'
+
 /*======================================================================*
 			   init_screen
  *======================================================================*/
@@ -65,7 +69,7 @@ PUBLIC void init_screen(TTY *p_tty)
 		out_char(p_tty->p_console, '#');
 	}
 
-	esc_begin = ESC_ENTER = 0;
+	esc_begin = 0;
 
 	set_cursor(p_tty->p_console->cursor);
 }
@@ -208,7 +212,7 @@ PRIVATE void fill_symbol(u8 *pos, const u8 ch, const u8 color)
 	pos[1] = color;
 }
 //
-void normal_out_char(CONSOLE *p_con, char ch)
+PRIVATE void normal_out_char(CONSOLE *p_con, char ch)
 {
 	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2); //cur
 
@@ -228,76 +232,29 @@ void normal_out_char(CONSOLE *p_con, char ch)
 		}
 
 		break;
-	case '\b':
-		if (p_con->cursor > p_con->original_addr)
-		{
-			//Find the cursor before
-			u8 *tmp_cursor = (u8 *)(V_MEM_BASE + (p_con->cursor - 1) * 2);
-			if ('\0' == *tmp_cursor)
-			{
-				//return back to the char until ch != '\0'
-				do
-				{
-					p_con->cursor--;
-					tmp_cursor -= 2;
-				} while (*tmp_cursor == '\0');
-				--p_con->cursor;
-				tmp_cursor = (u8 *)(V_MEM_BASE + (p_con->cursor) * 2);
-				fill_symbol(tmp_cursor, BLANK, DEFAULT_CHAR_COLOR);
-			}
-			else if (0x09 == *tmp_cursor)
-			{
-				int count = 4;
-				do
-				{
-					/* code */
-					--p_con->cursor;
-					--count;
-					fill_symbol(tmp_cursor, BLANK, DEFAULT_CHAR_COLOR);
-					tmp_cursor -= 2;
-				} while (*tmp_cursor == 0x09 && count > 0);
-			}
-			else
-			{
-				p_con->cursor--;
-				fill_symbol(tmp_cursor, 0x0, DEFAULT_CHAR_COLOR);
-			}
-		}
-		break;
-	case '\t':
-		if (p_con->cursor + 4 < p_con->original_addr +
-									p_con->v_mem_limit)
-		{
-			//这一行第一个字符在显存中的位置
-			int first_cursor = p_con->original_addr + ((p_con->cursor - p_con->original_addr) / SCREEN_WIDTH) * SCREEN_WIDTH;
-			int count = 4 - (p_con->cursor - first_cursor) % 4;
-			for (int i = 0; i < count; i++)
-			{
-				fill_symbol(p_vmem, 0x09, SPECIAL_CHAR_COLOR);
-				p_vmem += 2;
-				p_con->cursor++;
-			}
-		}
-		break;
 	case '\e':
 		//enter into ESC mode
 		esc_begin = p_con->cursor - 1;
-		esc_ptr = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
+		esc_begin_v_mem = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
 		ESC_MODE = 1;
+		break;
+	case '\b':
+	case '\t':
+		put_ch(p_con, ch);
 		break;
 	default:
 		if (p_con->cursor <
 			p_con->original_addr + p_con->v_mem_limit - 1)
 		{
 			fill_symbol(p_vmem, ch, DEFAULT_CHAR_COLOR);
-			p_vmem += 2;
 			p_con->cursor++;
 		}
+		break;
 		break;
 	}
 }
 //ESC mode == 1
-void esc_out_char(CONSOLE *p_con, char ch)
+PRIVATE void esc_out_char(CONSOLE *p_con, char ch)
 {
 	int found = 0;
 	int len = p_con->cursor - esc_begin - 1;
@@ -305,47 +262,6 @@ void esc_out_char(CONSOLE *p_con, char ch)
 	switch (ch)
 	{
 		//\t print out normally
-	case '\t':
-		if (p_con->cursor + 4 < p_con->original_addr +
-									p_con->v_mem_limit)
-		{
-			//这一行第一个字符在显存中的位置
-			int first_cursor = p_con->original_addr + ((p_con->cursor - p_con->original_addr) / SCREEN_WIDTH) * SCREEN_WIDTH;
-			int count = 4 - (p_con->cursor - first_cursor) % 4;
-			for (int i = 0; i < count; i++)
-			{
-				fill_symbol(p_vmem, 0x09, SPECIAL_CHAR_COLOR);
-				p_vmem += 2;
-				p_con->cursor++;
-			}
-		}
-		break;
-	case '\e':
-		while (p_vmem > esc_ptr)
-		{
-			*(p_vmem - 2) = ' ';
-			*(p_vmem - 1) = DEFAULT_CHAR_COLOR;
-			p_con->cursor--;
-			p_vmem = p_vmem - 2;
-		}
-
-		for (int temp_p_cursor = p_con->current_start_addr; temp_p_cursor <= p_con->cursor; temp_p_cursor++)
-		{
-			u8 *temp_p_vmem = (u8 *)(V_MEM_BASE + temp_p_cursor * 2);
-			if (*temp_p_vmem == 0x09 || *temp_p_vmem == 0x0A)
-			{
-				temp_p_vmem++;
-				*temp_p_vmem = SPECIAL_CHAR_COLOR;
-			}
-			else
-			{
-				temp_p_vmem++;
-				*temp_p_vmem = DEFAULT_CHAR_COLOR;
-			}
-		}
-		esc_ptr = 0;
-		ESC_MODE = 0;
-		break;
 	case '\n':
 		for (int temp_p_cursor = p_con->current_start_addr;
 			 temp_p_cursor <= esc_begin;
@@ -355,7 +271,7 @@ void esc_out_char(CONSOLE *p_con, char ch)
 			for (int i = 0; i < len * 2; i = i + 2)
 			{
 
-				if (*(temp_p_vmem + i) != *(esc_ptr + i))
+				if (*(temp_p_vmem + i) != *(esc_begin_v_mem + i))
 				{
 					found = 0;
 					break;
@@ -377,10 +293,110 @@ void esc_out_char(CONSOLE *p_con, char ch)
 		}
 		ESC_MODE = 2;
 		break;
+	case '\e':
+		while (p_vmem > esc_begin_v_mem)
+		{
+			*(p_vmem - 2) = ' ';
+			*(p_vmem - 1) = DEFAULT_CHAR_COLOR;
+			p_con->cursor--;
+			p_vmem = p_vmem - 2;
+		}
+
+		for (int temp_p_cursor = p_con->current_start_addr; temp_p_cursor <= p_con->cursor; temp_p_cursor++)
+		{
+			u8 *temp_p_vmem = (u8 *)(V_MEM_BASE + temp_p_cursor * 2);
+			if (*temp_p_vmem == 0x09 || *temp_p_vmem == 0x0A)
+			{
+				temp_p_vmem++;
+				*temp_p_vmem = SPECIAL_CHAR_COLOR;
+			}
+			else
+			{
+				temp_p_vmem++;
+				*temp_p_vmem = DEFAULT_CHAR_COLOR;
+			}
+		}
+		esc_begin_v_mem = 0;
+		ESC_MODE = 0;
+		break;
+
 	case '\b':
 		// pattern becomes null
-		if (p_vmem <= esc_ptr)
+		if (p_vmem <= esc_begin_v_mem)
 			break;
+	case '\t':
+		put_ch(p_con, ch);
+		break;
+	default:
+		if (p_con->cursor <
+			p_con->original_addr + p_con->v_mem_limit - 1)
+		{
+			fill_symbol(p_vmem, ch, ESC_CHAR_COLOR);
+			p_con->cursor++;
+		}
+		break;
+	}
+}
+
+//ESC mode == 2
+PRIVATE void enter_out_char(CONSOLE *p_con, char ch)
+{
+	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2); //cur
+	switch (ch)
+	{
+	case '\e':
+		while (p_vmem > esc_begin_v_mem)
+		{
+			*(p_vmem - 2) = ' ';
+			*(p_vmem - 1) = DEFAULT_CHAR_COLOR;
+			p_con->cursor--;
+			p_vmem = p_vmem - 2;
+		}
+
+		for (int temp_p_cursor = p_con->current_start_addr; temp_p_cursor <= p_con->cursor; temp_p_cursor++)
+		{
+			u8 *temp_p_vmem = (u8 *)(V_MEM_BASE + temp_p_cursor * 2);
+			if (*temp_p_vmem == 0x09 || *temp_p_vmem == 0x0A)
+			{
+				temp_p_vmem++;
+				*temp_p_vmem = SPECIAL_CHAR_COLOR;
+			}
+			else
+			{
+				temp_p_vmem++;
+				*temp_p_vmem = DEFAULT_CHAR_COLOR;
+			}
+		}
+		esc_begin_v_mem = 0;
+		ESC_MODE = 0;
+		break;
+
+	default:
+		break;
+	}
+}
+
+PRIVATE void put_ch(CONSOLE *p_con, const char ch)
+{
+	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2); //cur
+	switch (ch)
+	{
+	case '\t':
+		if (p_con->cursor + 4 < p_con->original_addr +
+									p_con->v_mem_limit)
+		{
+			//这一行第一个字符在显存中的位置
+			int first_cursor = p_con->original_addr + ((p_con->cursor - p_con->original_addr) / SCREEN_WIDTH) * SCREEN_WIDTH;
+			int count = 4 - (p_con->cursor - first_cursor) % 4;
+			for (int i = 0; i < count; i++)
+			{
+				fill_symbol(p_vmem, 0x09, SPECIAL_CHAR_COLOR);
+				p_vmem += 2;
+				p_con->cursor++;
+			}
+		}
+		break;
+	case '\b':
 		if (p_con->cursor > p_con->original_addr)
 		{
 			//Find the cursor before
@@ -423,44 +439,6 @@ void esc_out_char(CONSOLE *p_con, char ch)
 			fill_symbol(p_vmem, ch, ESC_CHAR_COLOR);
 			p_con->cursor++;
 		}
-		break;
-	}
-}
-
-//ESC mode == 2
-void enter_out_char(CONSOLE *p_con, char ch)
-{
-	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2); //cur
-	switch (ch)
-	{
-	case '\e':
-		while (p_vmem > esc_ptr)
-		{
-			*(p_vmem - 2) = ' ';
-			*(p_vmem - 1) = DEFAULT_CHAR_COLOR;
-			p_con->cursor--;
-			p_vmem = p_vmem - 2;
-		}
-
-		for (int temp_p_cursor = p_con->current_start_addr; temp_p_cursor <= p_con->cursor; temp_p_cursor++)
-		{
-			u8 *temp_p_vmem = (u8 *)(V_MEM_BASE + temp_p_cursor * 2);
-			if (*temp_p_vmem == 0x09 || *temp_p_vmem == 0x0A)
-			{
-				temp_p_vmem++;
-				*temp_p_vmem = SPECIAL_CHAR_COLOR;
-			}
-			else
-			{
-				temp_p_vmem++;
-				*temp_p_vmem = DEFAULT_CHAR_COLOR;
-			}
-		}
-		esc_ptr = 0;
-		ESC_MODE = 0;
-		break;
-
-	default:
 		break;
 	}
 }

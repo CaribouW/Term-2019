@@ -64,7 +64,7 @@ u32 keymap[NR_SCAN_CODES * MAP_COLS] = {
 /* 0x29 - '`'		*/	'`',		'~',		0,
 /* 0x2A - l. SHIFT	*/	SHIFT_L,	SHIFT_L,	0,
 /* 0x2B - '\'		*/	'\\',		'|',		0,
-/* 0x2C - 'z'		*/	'z',		'Z',		0,
+/* 0x2C - 'z'		*/	'z',		'Z',		0,			//set
 /* 0x2D - 'x'		*/	'x',		'X',		0,
 /* 0x2E - 'c'		*/	'c',		'C',		0,
 /* 0x2F - 'v'		*/	'v',		'V',		0,

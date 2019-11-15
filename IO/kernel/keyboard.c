@@ -99,7 +99,7 @@ PUBLIC void keyboard_read(TTY *p_tty)
 	{
 		code_with_E0 = 0;
 
-		scan_code = get_byte_from_kbuf();//fetch current scan code
+		scan_code = get_byte_from_kbuf(); //fetch current scan code
 
 		/* 下面开始解析扫描码 */
 		if (scan_code == 0xE1)
@@ -166,6 +166,7 @@ PUBLIC void keyboard_read(TTY *p_tty)
 			column = 0;
 
 			int caps = shift_l || shift_r;
+			int ctrls = ctrl_l || ctrl_r;
 			if (caps_lock)
 			{
 				if ((keyrow[0] >= 'a') && (keyrow[0] <= 'z'))
@@ -308,7 +309,11 @@ PUBLIC void keyboard_read(TTY *p_tty)
 						break;
 					}
 				}
-
+				if (ctrls && key == 'z'){
+					key = '\z';
+					in_process(p_tty, key);
+					return;
+				}
 				key |= shift_l ? FLAG_SHIFT_L : 0;
 				key |= shift_r ? FLAG_SHIFT_R : 0;
 				key |= ctrl_l ? FLAG_CTRL_L : 0;
@@ -316,6 +321,7 @@ PUBLIC void keyboard_read(TTY *p_tty)
 				key |= alt_l ? FLAG_ALT_L : 0;
 				key |= alt_r ? FLAG_ALT_R : 0;
 				key |= pad ? FLAG_PAD : 0;
+
 
 				in_process(p_tty, key);
 			}

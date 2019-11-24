@@ -2,60 +2,146 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/login.css">
-    <title>login page</title>
+    <title>Login</title>
 </head>
 <body>
-<div style="position: absolute;left: 10px">
-    <a href="homepage.html">跳转到主页</a>
+<div class="wrap">
+    <div class="left-form">
+        <h2>欢迎回来</h2>
+        <p>邮箱</p>
+        <input class="email"/>
+        <p>密码</p>
+        <input class="password" type="password"/>
+        <div class="forgotten">
+            <a href="https://www.baidu.com">忘记密码?</a>
+        </div>
+        <div>
+            <a href="home.html">
+                <button class="btn" type="button">登录</button>
+            </a>
+        </div>
+        <div class="jmp">
+            <a href="login.html">
+                立即注册</a>
+        </div>
+    </div>
 </div>
-<div class="login-body">
-    <div class="form">
-        <form class="form">
-            <div class="form-bg">
-                <img src="https://hello-gw.pw/theme/malio/assets/img/stisla-fill.svg" style="width: 5%"/>
-            </div>
-            <div class="board">
-                <div class="header">
-                    登录
-                </div>
-                <div class="inputs">
-                    <div class="account title">
-                        <div>账号:</div>
-                        <label class="account-input">
-                            <input>
-                        </label>
-                    </div>
-                    <div class="psw">
-                        <div class="psw-input title">
-                            <span>密码:</span>
-                            <a href="login.html">忘记密码?</a>
-                        </div>
-                        <label>
-                            <input>
-                        </label>
-                    </div>
-                </div>
-                <div class="check">
-                    <label>这里设置校验码</label>
-                </div>
-                <div class="submits">
-                    <div class="login-btns">
-                        <button class="submit">登录</button>
-                        <button class="reset">清空</button>
-                    </div>
-                </div>
-            </div>
-            <div class="to-register">
-                <label>还没有账号?</label>
-                <a href="register.html">马上注册-></a>
-            </div>
-        </form>
-    </div>
-    <div class="to-register">
-        <label>Copyright © 2019 Caribou</label>
-    </div>
+<div class="footer">
+    <label>Copy right @ Caribou</label>
 </div>
 </body>
+<style lang="css">
+    *, *:before, *:after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html,
+    body {
+        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        background: #ededed;
+        height: 100%;
+        position: relative;
+    }
+
+    input, button {
+        border: none;
+        outline: none;
+        background: none;
+        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    }
+
+    .wrap {
+        position: absolute;
+        top: 10%;
+        left: 15%;
+        overflow: hidden;
+        margin: 0 auto;
+        width: 70%;
+        height: 80%;
+        background-image: url(resources/bg.jpg);
+        background-size: cover;
+    }
+
+    .left-form {
+        width: 70%;
+        height: 100%;
+        padding: 0 20%;
+        background: #fff;
+        padding-top: 10%;
+        min-width: 600px;
+        position: relative;
+    }
+
+    .left-form * {
+        text-align: center;
+    }
+
+    .left-form > h2 {
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+        font-weight: bold;
+        font-size: 37px;
+    }
+
+    .left-form > input {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+        display: flex;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 5px;
+        font-size: 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+        text-align: center;
+        color: #838383;
+    }
+
+    .left-form > .forgotten,
+    .left-form > .jmp {
+        color: gray;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .left-form > .jmp {
+        box-sizing: border-box;
+        height: max-content;
+    }
+
+    .left-form .btn {
+        border: None;
+        width: 100%;
+        height: 40px;
+        border-radius: 20px;
+        background-color: #d4af7a;
+        font-weight: normal;
+        font-size: 16px;
+        color: white;
+    }
+
+    .btn:hover {
+        cursor: pointer;
+    }
+
+    .left-form > * {
+        margin: 30px 0;
+    }
+
+    .footer {
+        display: block;
+        position: absolute;
+        left: 50%;
+        bottom: 3%;
+        box-sizing: border-box;
+        transform: translate(-50%, -50%);
+    }
+
+    .footer > * {
+        color: #2b2b2b;
+        font-family: "Source Code Pro", serif;
+
+    }
+</style>
 </html>

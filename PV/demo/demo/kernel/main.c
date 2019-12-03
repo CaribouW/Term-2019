@@ -15,6 +15,7 @@
 #include "global.h"
 #include "proto.h"
 
+
 /*======================================================================*
                             kernel_main
  *======================================================================*/
@@ -22,30 +23,35 @@ PUBLIC int kernel_main()
 {
 	disp_str("-----\"kernel_main\" begins-----\n");
 
-	TASK *p_task = task_table;
-	PROCESS *p_proc = proc_table;
-	char *p_task_stack = task_stack + STACK_SIZE_TOTAL;
-	u16 selector_ldt = SELECTOR_LDT_FIRST;
+	TASK*		p_task		= task_table;
+	PROCESS*	p_proc		= proc_table;
+	char*		p_task_stack	= task_stack + STACK_SIZE_TOTAL;
+	u16		selector_ldt	= SELECTOR_LDT_FIRST;
 	int i;
-	for (i = 0; i < NR_TASKS; i++)
-	{
-		strcpy(p_proc->p_name, p_task->name); // name of the process
-		p_proc->pid = i;					  // pid
+	for (i = 0; i < NR_TASKS; i++) {
+		strcpy(p_proc->p_name, p_task->name);	// name of the process
+		p_proc->pid = i;			// pid
 
 		p_proc->ldt_sel = selector_ldt;
 
 		memcpy(&p_proc->ldts[0], &gdt[SELECTOR_KERNEL_CS >> 3],
-			   sizeof(DESCRIPTOR));
+		       sizeof(DESCRIPTOR));
 		p_proc->ldts[0].attr1 = DA_C | PRIVILEGE_TASK << 5;
 		memcpy(&p_proc->ldts[1], &gdt[SELECTOR_KERNEL_DS >> 3],
-			   sizeof(DESCRIPTOR));
+		       sizeof(DESCRIPTOR));
 		p_proc->ldts[1].attr1 = DA_DRW | PRIVILEGE_TASK << 5;
-		p_proc->regs.cs = ((8 * 0) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		p_proc->regs.ds = ((8 * 1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		p_proc->regs.es = ((8 * 1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		p_proc->regs.fs = ((8 * 1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		p_proc->regs.ss = ((8 * 1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		p_proc->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK) | RPL_TASK;
+		p_proc->regs.cs	= ((8 * 0) & SA_RPL_MASK & SA_TI_MASK)
+			| SA_TIL | RPL_TASK;
+		p_proc->regs.ds	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
+			| SA_TIL | RPL_TASK;
+		p_proc->regs.es	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
+			| SA_TIL | RPL_TASK;
+		p_proc->regs.fs	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
+			| SA_TIL | RPL_TASK;
+		p_proc->regs.ss	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
+			| SA_TIL | RPL_TASK;
+		p_proc->regs.gs	= (SELECTOR_KERNEL_GS & SA_RPL_MASK)
+			| RPL_TASK;
 
 		p_proc->regs.eip = (u32)p_task->initial_eip;
 		p_proc->regs.esp = (u32)p_task_stack;
@@ -62,102 +68,70 @@ PUBLIC int kernel_main()
 	proc_table[2].ticks = proc_table[2].priority = 1;
 	proc_table[3].ticks = proc_table[3].priority = 1;
 	proc_table[4].ticks = proc_table[4].priority = 1;
-	proc_table[5].ticks = proc_table[5].priority = 1;
-	proc_table[6].ticks = proc_table[6].priority = 1;
 
-	proc_table[0].is_wait = proc_table[0].sleep_ticks = 0;
-	proc_table[1].is_wait = proc_table[1].sleep_ticks = 0;
-	proc_table[2].is_wait = proc_table[2].sleep_ticks = 0;
-	proc_table[3].is_wait = proc_table[3].sleep_ticks = 0;
-	proc_table[4].is_wait = proc_table[4].sleep_ticks = 0;
-	proc_table[5].is_wait = proc_table[5].sleep_ticks = 0;
-	proc_table[6].is_wait = proc_table[6].sleep_ticks = 0;
+	proc_table[0].wait = proc_table[0].sleep_ticks = 0;
+	proc_table[1].wait = proc_table[1].sleep_ticks = 0;
+	proc_table[2].wait = proc_table[2].sleep_ticks = 0;
+	proc_table[3].wait = proc_table[3].sleep_ticks = 0;
+	proc_table[4].wait = proc_table[4].sleep_ticks = 0;
 
 	proc_table[0].next = 0;
-	proc_table[1].next = 0;
+    proc_table[1].next = 0;
 	proc_table[2].next = 0;
 	proc_table[3].next = 0;
 	proc_table[4].next = 0;
-	proc_table[5].next = 0;
-	proc_table[6].next = 0;
 
 	k_reenter = 0;
 	ticks = 0;
 
-	p_proc_ready = proc_table;
+	p_proc_ready	= proc_table;
 
 	init_clock();
-	init_keyboard();
+    init_keyboard();
 
 	restart();
 
-	while (1)
-	{
+	while(1){}
+}
+
+/*======================================================================*
+                               Barber
+ *======================================================================*/
+void Barber()
+{
+	init();
+	barber();
+}
+
+/*======================================================================*
+                               Customer_A
+ *======================================================================*/
+void Customer_A()
+{
+	while(1){
+	customers("A");
+	system_process_sleep(10000);
 	}
 }
 
 /*======================================================================*
-                               ReaderA
+                               Customer_B
  *======================================================================*/
-void ReaderA()
+void Customer_B()
 {
-	while (1)
-	{
-		reader("A", 2);
+	while(1){
+	customers("B");
+	system_process_sleep(10000);
 	}
 }
 
 /*======================================================================*
-                               ReaderB
+                               Customer_C
  *======================================================================*/
-void ReaderB()
+void Customer_C()
 {
-	while (1)
-	{
-		// reader("B", 2);
-	}
-}
-
-/*======================================================================*
-                               ReaderC
- *======================================================================*/
-void ReaderC()
-{
-	while (1)
-	{
-		// reader("C",3);
-	}
-}
-
-/*======================================================================*
-                               WriterD
- *======================================================================*/
-void WriterD()
-{
-	while (1)
-	{
-		// writer("D",2);
-	}
-}
-
-/*======================================================================*
-                               WriterE
- *======================================================================*/
-void WriterE()
-{
-	while (1)
-	{
-		writer("E",2);
-	}
-}
-
-/*======================================================================*
-                               F
- *======================================================================*/
-void F()
-{
-	while (1)
-	{
-		// summary();
+	while(1){
+	customers("C");
+	system_process_sleep(10000);
 	}
 }

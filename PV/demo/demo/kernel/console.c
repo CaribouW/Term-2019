@@ -205,6 +205,8 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction)
 
 PUBLIC void clear_screen(){
     count++;
+    int time_to_clean = 15; 
+    
     if(count == 1000){
 	//清屏
         init_screen(current_tty);

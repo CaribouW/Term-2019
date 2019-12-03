@@ -34,5 +34,5 @@ extern	TTY		tty_table[];
 extern  CONSOLE         console_table[];
 
 
-extern  char		colors[];
+EXTERN  char		colors[];
 

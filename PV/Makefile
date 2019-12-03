@@ -13,12 +13,12 @@ ENTRYOFFSET	=   0x400
 # Programs, flags, etc.
 ASM		= nasm
 DASM		= ndisasm
-CC		= gcc
-LD		= ld
+CC		= gcc -m32
+LD		= ld -m elf_i386
 ASMBFLAGS	= -I boot/include/
-ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -fno-stack-protector
-LDFLAGS		= -s -Ttext $(ENTRYPOINT)
+ASMKFLAGS	= -I include/ -f elf32
+CFLAGS		= -I include/ -c -fno-builtin  -fno-stack-protector -m32
+LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
 # This Program
@@ -27,15 +27,16 @@ ORANGESKERNEL	= kernel.bin
 OBJS		= kernel/kernel.o kernel/syscall.o kernel/start.o kernel/main.o\
 			kernel/clock.o kernel/keyboard.o kernel/tty.o kernel/console.o\
 			kernel/i8259.o kernel/global.o kernel/protect.o kernel/proc.o\
-			lib/kliba.o lib/klib.o lib/string.o 
+			lib/kliba.o lib/klib.o lib/string.o
 DASMOUTPUT	= kernel.bin.asm
 
 # All Phony Targets
-.PHONY : everything final image clean realclean disasm all buildimg run
+.PHONY : everything final image clean realclean disasm all buildimg
 
 # Default starting position
-run: image 
+run: image
 	bochs
+
 nop :
 	@echo "why not \`make image' huh? :)"
 
@@ -82,7 +83,7 @@ kernel/start.o: kernel/start.c include/type.h include/const.h include/protect.h 
 	$(CC) $(CFLAGS) -o $@ $<
 
 kernel/main.o: kernel/main.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
-			include/global.h 
+			include/global.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 kernel/clock.o: kernel/clock.c
@@ -120,3 +121,5 @@ lib/kliba.o : lib/kliba.asm
 
 lib/string.o : lib/string.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
+
+

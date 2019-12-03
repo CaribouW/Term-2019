@@ -60,18 +60,22 @@ typedef struct semaphore {
 }SEMAPHORE;
 
 /* Number of tasks */
-#define NR_TASKS	5
+#define NR_TASKS	7
 
 /* stacks of tasks */
 #define STACK_SIZE_TTY		0x8000
-#define STACK_SIZE_Barber	0x8000
-#define STACK_SIZE_Customer_A	0x8000
-#define STACK_SIZE_Customer_B	0x8000
-#define STACK_SIZE_Customer_C   0x8000
+#define STACK_SIZE_READER_A	0x8000
+#define STACK_SIZE_READER_B	0x8000
+#define STACK_SIZE_READER_C	0x8000
+#define STACK_SIZE_Writer_D	0x8000
+#define STACK_SIZE_Writer_E	0x8000
+#define STACK_SIZE_F		0x8000
 
 #define STACK_SIZE_TOTAL	(STACK_SIZE_TTY + \
-				STACK_SIZE_Barber + \
-				STACK_SIZE_Customer_A + \
-				STACK_SIZE_Customer_B + \
-				STACK_SIZE_Customer_C)
+				STACK_SIZE_READER_A + \
+				STACK_SIZE_READER_B + \
+				STACK_SIZE_READER_C + \
+				STACK_SIZE_Writer_D + \
+				STACK_SIZE_Writer_E + \
+				STACK_SIZE_F)
 

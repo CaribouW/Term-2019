@@ -22,10 +22,12 @@ PUBLIC void	delay(int time);
 void restart();
 
 /* main.c */
-void Barber();
-void Customer_A();
-void Customer_B();
-void Customer_C();
+void ReaderA();
+void ReaderB();
+void ReaderC();
+void WriterD();
+void WriterE();
+void F();
 
 /* i8259.c */
 PUBLIC void put_irq_handler(int irq, irq_handler handler);
@@ -54,9 +56,6 @@ PUBLIC int sys_process_sleep(int milli_sec);
 PUBLIC  int 	sys_disp_str(char* str);
 PUBLIC int sys_P(SEMAPHORE* s);
 PUBLIC int sys_V(SEMAPHORE* s);
-PUBLIC void init();
-PUBLIC void barber();
-PUBLIC void customers(char* name);
 
 
 /* syscall.asm */

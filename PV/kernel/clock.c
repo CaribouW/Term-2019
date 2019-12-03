@@ -23,7 +23,6 @@ PUBLIC void clock_handler(int irq)
 {
 	ticks++;
 	p_proc_ready->ticks--;
-  clear_screen();
 
 	if (k_reenter != 0) {
 		return;

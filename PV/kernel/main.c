@@ -58,11 +58,12 @@ PUBLIC int kernel_main()
 	}
 
 	proc_table[0].ticks = proc_table[0].priority = 1;
-	proc_table[1].ticks = proc_table[1].priority = 1;
-	proc_table[2].ticks = proc_table[2].priority = 1;
-	proc_table[3].ticks = proc_table[3].priority = 1;
-	proc_table[4].ticks = proc_table[4].priority = 1;
-	proc_table[5].ticks = proc_table[6].priority = 1;
+	proc_table[1].ticks = proc_table[1].priority = 2;
+	proc_table[2].ticks = proc_table[2].priority = 3;
+	proc_table[3].ticks = proc_table[3].priority = 3;
+	proc_table[4].ticks = proc_table[4].priority = 4;
+	proc_table[5].ticks = proc_table[5].priority = 1;
+	proc_table[6].ticks = proc_table[6].priority = 10;
 
 	proc_table[0].wait = proc_table[0].sleep_ticks = 0;
 	proc_table[1].wait = proc_table[1].sleep_ticks = 0;

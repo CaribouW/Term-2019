@@ -104,6 +104,7 @@ void ReaderA()
 	while (1)
 	{
 		reader("A", 2);
+		milli_delay(1);
 	}
 }
 
@@ -114,7 +115,8 @@ void ReaderB()
 {
 	while (1)
 	{
-		// reader("B", 2);
+		reader("B", 2);
+		milli_delay(1);
 	}
 }
 
@@ -125,7 +127,8 @@ void ReaderC()
 {
 	while (1)
 	{
-		// reader("C",3);
+		reader("C",3);
+		milli_delay(1);
 	}
 }
 
@@ -136,7 +139,9 @@ void WriterD()
 {
 	while (1)
 	{
-		// writer("D",2);
+		writer("D",3);
+		milli_delay(1);
+
 	}
 }
 
@@ -148,6 +153,7 @@ void WriterE()
 	while (1)
 	{
 		writer("E",2);
+		milli_delay(1);
 	}
 }
 
@@ -159,5 +165,6 @@ void F()
 	while (1)
 	{
 		// summary();
+		milli_delay(1);
 	}
 }

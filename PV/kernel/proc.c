@@ -15,7 +15,7 @@
 #include "global.h"
 #include "proto.h"
 
-#define WRITER
+// #define WRITER
 
 PRIVATE SEMAPHORE wrmutex = {1, 0}, count_mutex = {1, 0}, print_mutex = {1, 0};
 PRIVATE int reader_count = 0;
@@ -199,7 +199,7 @@ PUBLIC void writer(char *name, int len)
 #ifdef WRITER
 	sys_P(&writer_first);
 #endif
-	sys_P(&wrmutex);
+	// sys_P(&wrmutex);
 	//Begin read
 	sys_disp_str(name);
 	sys_disp_str(" begins writing\n");
@@ -207,7 +207,7 @@ PUBLIC void writer(char *name, int len)
 	//stop read
 	sys_disp_str(name);
 	sys_disp_str(" stops writing\n");
-	sys_V(&wrmutex);
+	// sys_V(&wrmutex);
 #ifdef WRITER
 	sys_V(&writer_first);
 #endif
@@ -232,4 +232,6 @@ PUBLIC void summary()
 		sys_disp_str("Now is writing\n");
 	}
 	sys_V(&count_mutex);
+	sys_process_sleep(10000);
+
 }

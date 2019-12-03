@@ -19,7 +19,7 @@
 PRIVATE char buffer[10];
 PRIVATE int now;
 PRIVATE int ID;
-PRIVATE int waiting;
+PRIVATE int is_waiting;
 PRIVATE int chairs;
 PRIVATE SEMAPHORE 	semaphores[3] = {{0, 0},{0, 0},{1, 0},
               									//customers, barber, mutex
@@ -42,7 +42,7 @@ PUBLIC void schedule()
 
 	while (!greatest_ticks) {
 		for (p = proc_table; p < proc_table+NR_TASKS; p++) {
-			if (p -> wait || p -> sleep_ticks){
+			if (p -> is_wait || p -> sleep_ticks){
 				continue;
 			}
 
@@ -54,7 +54,7 @@ PUBLIC void schedule()
 
 		if (!greatest_ticks) {
 			for (p = proc_table; p < proc_table+NR_TASKS; p++) {
-				if (p -> wait || p -> sleep_ticks){
+				if (p -> is_wait || p -> sleep_ticks){
 					continue;
 				}
 				p->ticks = p->priority;
@@ -105,9 +105,9 @@ PUBLIC int sys_P(SEMAPHORE* s){
 	s->value--;
 	if(s->value < 0){
 		//sleep process
-		p_proc_ready->wait = 1;
+		p_proc_ready->is_wait = 1;
 
-		//add the process to the wait queue
+		//add the process to the is_wait queue
 		if(s -> queue == 0){
 			s->queue = p_proc_ready;
 		}
@@ -133,7 +133,7 @@ PUBLIC int sys_V(SEMAPHORE* s){
 		p_proc_ready = s->queue;
 		s->queue = s-> queue -> next;
 		p_proc_ready->next = 0;
-		p_proc_ready->wait = 0;
+		p_proc_ready->is_wait = 0;
 		
 	}
 	return 0;
@@ -144,7 +144,7 @@ PUBLIC int sys_V(SEMAPHORE* s){
  *======================================================================*/
 PUBLIC void init(){
 	ID = 0;
-	waiting = 0;
+	is_waiting = 0;
 	chairs = 3;
 	first_semaphore = semaphores;
 }
@@ -158,7 +158,7 @@ PUBLIC void barber(){
 
 		system_P(first_semaphore);
 		system_P(first_semaphore + 2);
-		waiting--;
+		is_waiting--;
 		system_V(first_semaphore + 1);
 		system_V(first_semaphore + 2);
 
@@ -181,16 +181,16 @@ PUBLIC void customers(char* name){
 	itoa(buffer, count);
 	system_disp_str(buffer);
 	system_disp_str(" come. ");
-	itoa(buffer, waiting);
+	itoa(buffer, is_waiting);
 	system_disp_str(buffer);
-	system_disp_str(" people waiting\n");
-	if(waiting < chairs){
+	system_disp_str(" people is_waiting\n");
+	if(is_waiting < chairs){
 		system_disp_str("Customer ");
 		itoa(buffer, count);
 		system_disp_str(buffer);
-		system_disp_str(" waiting \n");
+		system_disp_str(" is_waiting \n");
 
-		waiting++;
+		is_waiting++;
 		system_V(first_semaphore);
 		system_V(first_semaphore + 2);
 		system_P(first_semaphore + 1);

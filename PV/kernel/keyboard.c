@@ -36,7 +36,7 @@ PRIVATE int	scroll_lock;	/* Scroll Lock	 */
 
 PRIVATE u8	get_byte_from_kbuf();
 PRIVATE void    set_leds();
-PRIVATE void    kb_wait();
+PRIVATE void    kb_is_wait();
 PRIVATE void    kb_ack();
 
 /*======================================================================*
@@ -315,9 +315,9 @@ PRIVATE u8 get_byte_from_kbuf()       /* 从键盘缓冲区中读取下一个字
 }
 
 /*======================================================================*
-				 kb_wait
+				 kb_is_wait
  *======================================================================*/
-PRIVATE void kb_wait()	/* 等待 8042 的输入缓冲区空 */
+PRIVATE void kb_is_wait()	/* 等待 8042 的输入缓冲区空 */
 {
 	u8 kb_stat;
 
@@ -346,11 +346,11 @@ PRIVATE void set_leds()
 {
 	u8 leds = (caps_lock << 2) | (num_lock << 1) | scroll_lock;
 
-	kb_wait();
+	kb_is_wait();
 	out_byte(KB_DATA, LED_CODE);
 	kb_ack();
 
-	kb_wait();
+	kb_is_wait();
 	out_byte(KB_DATA, leds);
 	kb_ack();
 }

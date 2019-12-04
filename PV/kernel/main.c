@@ -127,7 +127,7 @@ void ReaderC()
 {
 	while (1)
 	{
-		reader("C",3);
+		// reader("C",3);
 		milli_delay(1);
 	}
 }
@@ -139,7 +139,7 @@ void WriterD()
 {
 	while (1)
 	{
-		writer("D",3);
+		// writer("D",3);
 		milli_delay(1);
 
 	}
@@ -152,7 +152,7 @@ void WriterE()
 {
 	while (1)
 	{
-		writer("E",2);
+		// writer("E",2);
 		milli_delay(1);
 	}
 }
@@ -162,9 +162,5 @@ void WriterE()
  *======================================================================*/
 void F()
 {
-	while (1)
-	{
-		// summary();
-		milli_delay(1);
-	}
+	summary();
 }

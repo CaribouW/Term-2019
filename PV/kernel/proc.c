@@ -15,14 +15,19 @@
 #include "global.h"
 #include "proto.h"
 
-// #define WRITER
-
+#define READER_LIMIT 1
+#define WRITER
 PRIVATE SEMAPHORE wrmutex = {1, 0}, count_mutex = {1, 0}, print_mutex = {1, 0};
-PRIVATE int reader_count = 0;
+PRIVATE int reader_count = 0, total = 0;
 PRIVATE char buffer[10];
 
+PRIVATE void countR();
 #ifdef WRITER
 PRIVATE SEMAPHORE writer_first = {1, 0};
+#endif
+
+#ifdef READER_LIMIT
+PRIVATE SEMAPHORE reader_mutex = {0, 0};
 #endif
 /*======================================================================*
                               schedule
@@ -164,20 +169,30 @@ PUBLIC void reader(char *name, int len)
 #ifdef WRITER
 	sys_P(&writer_first); //
 #endif
+#ifdef READER_LIMIT
+	sys_P(&reader_mutex);
+#endif
 	sys_P(&count_mutex); //counter
 	if (0 == reader_count)
 	{
 		sys_P(&wrmutex); //block writer;
 	}
 	++reader_count;
+	++total;
+	total %= 4;
 	sys_V(&count_mutex);
+#ifdef READER_LIMIT
+	sys_V(&reader_mutex);
+#endif
 #ifdef WRITER
 	sys_V(&writer_first); //
 #endif
 	//======read begin===========
 	sys_disp_str(name);
 	sys_disp_str(" begins reading\n");
+	// milli_delay(10000 * len);
 	sys_process_sleep(10000 * len);
+
 	//stop read
 	sys_disp_str(name);
 	sys_disp_str(" stops reading\n");
@@ -199,39 +214,51 @@ PUBLIC void writer(char *name, int len)
 #ifdef WRITER
 	sys_P(&writer_first);
 #endif
-	// sys_P(&wrmutex);
+	sys_P(&wrmutex);
 	//Begin read
 	sys_disp_str(name);
 	sys_disp_str(" begins writing\n");
+	// milli_delay(10000 * len);
 	sys_process_sleep(10000 * len);
 	//stop read
 	sys_disp_str(name);
 	sys_disp_str(" stops writing\n");
-	// sys_V(&wrmutex);
+	sys_V(&wrmutex);
 #ifdef WRITER
 	sys_V(&writer_first);
 #endif
-
 }
 
 PUBLIC void summary()
 {
-	sys_P(&count_mutex);
+	reader_count = total = 0x0;
+	while (1)
+	{
+		sys_P(&count_mutex);
+		countR();
 
+		sys_V(&count_mutex);
+		milli_delay(10000);
+	}
+}
+
+PRIVATE void countR()
+{
 	sys_disp_str("============Summary============\n");
-	if (reader_count > 0)
-	{
-		sys_disp_str("Now is reading\n");
-		sys_disp_str("We have ");
-		itoa(buffer, reader_count);
-		sys_disp_str(buffer);
-		sys_disp_str(" readers reading\n");
-	}
-	else
-	{
-		sys_disp_str("Now is writing\n");
-	}
-	sys_V(&count_mutex);
-	sys_process_sleep(10000);
-
+	sys_disp_str("We have ");
+	itoa(buffer, reader_count);
+	sys_disp_str(buffer);
+	sys_disp_str(" readers reading\n");
+	// if (total > 0)
+	// {
+	// 	sys_disp_str("Now is reading\n");
+	// 	sys_disp_str("We have ");
+	// 	itoa(buffer, total);
+	// 	sys_disp_str(buffer);
+	// 	sys_disp_str(" readers reading\n");
+	// }
+	// else
+	// {
+	// 	sys_disp_str("Now is writing\n");
+	// }
 }

@@ -58,20 +58,20 @@ PUBLIC int kernel_main()
 	}
 
 	proc_table[0].ticks = proc_table[0].priority = 1;
-	proc_table[1].ticks = proc_table[1].priority = 2;
-	proc_table[2].ticks = proc_table[2].priority = 3;
-	proc_table[3].ticks = proc_table[3].priority = 3;
-	proc_table[4].ticks = proc_table[4].priority = 4;
+	proc_table[1].ticks = proc_table[1].priority = 1;
+	proc_table[2].ticks = proc_table[2].priority = 1;
+	proc_table[3].ticks = proc_table[3].priority = 1;
+	proc_table[4].ticks = proc_table[4].priority = 1;
 	proc_table[5].ticks = proc_table[5].priority = 1;
-	proc_table[6].ticks = proc_table[6].priority = 10;
+	proc_table[6].ticks = proc_table[6].priority = 1;
 
-	proc_table[0].wait = proc_table[0].sleep_ticks = 0;
-	proc_table[1].wait = proc_table[1].sleep_ticks = 0;
-	proc_table[2].wait = proc_table[2].sleep_ticks = 0;
-	proc_table[3].wait = proc_table[3].sleep_ticks = 0;
-	proc_table[4].wait = proc_table[4].sleep_ticks = 0;
-	proc_table[5].wait = proc_table[5].sleep_ticks = 0;
-	proc_table[6].wait = proc_table[6].sleep_ticks = 0;
+	proc_table[0].is_wait = proc_table[0].sleep_ticks = 0;
+	proc_table[1].is_wait = proc_table[1].sleep_ticks = 0;
+	proc_table[2].is_wait = proc_table[2].sleep_ticks = 0;
+	proc_table[3].is_wait = proc_table[3].sleep_ticks = 0;
+	proc_table[4].is_wait = proc_table[4].sleep_ticks = 0;
+	proc_table[5].is_wait = proc_table[5].sleep_ticks = 0;
+	proc_table[6].is_wait = proc_table[6].sleep_ticks = 0;
 
 	proc_table[0].next = 0;
 	proc_table[1].next = 0;
@@ -103,8 +103,8 @@ void ReaderA()
 {
 	while (1)
 	{
-		sys_disp_str("A");
-		milli_delay(10000);
+		reader("A", 2);
+		milli_delay(1);
 	}
 }
 
@@ -115,8 +115,8 @@ void ReaderB()
 {
 	while (1)
 	{
-		sys_disp_str("B");
-		milli_delay(10000);
+		reader("B", 2);
+		milli_delay(1);
 	}
 }
 
@@ -127,8 +127,8 @@ void ReaderC()
 {
 	while (1)
 	{
-		sys_disp_str("C");
-		milli_delay(10000);
+		// reader("C",3);
+		milli_delay(1);
 	}
 }
 
@@ -139,8 +139,9 @@ void WriterD()
 {
 	while (1)
 	{
-		sys_disp_str("D");
-		milli_delay(10000);
+		// writer("D",3);
+		milli_delay(1);
+
 	}
 }
 
@@ -151,8 +152,8 @@ void WriterE()
 {
 	while (1)
 	{
-		sys_disp_str("E");
-		milli_delay(10000);
+		// writer("E",2);
+		milli_delay(1);
 	}
 }
 
@@ -161,9 +162,5 @@ void WriterE()
  *======================================================================*/
 void F()
 {
-	while (1)
-	{
-		sys_disp_str("F");
-		milli_delay(10000);
-	}
+	summary();
 }

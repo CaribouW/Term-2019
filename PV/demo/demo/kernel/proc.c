@@ -106,8 +106,6 @@ PUBLIC int sys_P(SEMAPHORE* s){
 	if(s->value < 0){
 		//sleep process
 		p_proc_ready->wait = 1;
-
-		//add the process to the wait queue
 		if(s -> queue == 0){
 			s->queue = p_proc_ready;
 		}
@@ -118,6 +116,7 @@ PUBLIC int sys_P(SEMAPHORE* s){
 			}
 			rear->next = p_proc_ready;
 		}
+		//
 		schedule();
 	}
 	return 0;
@@ -131,6 +130,7 @@ PUBLIC int sys_V(SEMAPHORE* s){
 	if(s->value <= 0){
 		//wake up process
 		p_proc_ready = s->queue;
+		
 		s->queue = s-> queue -> next;
 		p_proc_ready->next = 0;
 		p_proc_ready->wait = 0;

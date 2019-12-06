@@ -25,7 +25,7 @@
 PRIVATE void set_cursor(unsigned int position);
 PRIVATE void set_video_start_addr(u32 addr);
 PRIVATE void flush(CONSOLE* p_con);
-
+PRIVATE TTY *current_tty;
 /*======================================================================*
 			   init_screen
  *======================================================================*/
@@ -34,22 +34,24 @@ PUBLIC void init_screen(TTY* p_tty)
 	int nr_tty = p_tty - tty_table;
 	p_tty->p_console = console_table + nr_tty;
 
-	int v_mem_size = V_MEM_SIZE >> 1;	/* 显存总大小 (in WORD) */
+	int v_mem_size = V_MEM_SIZE >> 1; /* 显存总大小 (in WORD) */
 
-	int con_v_mem_size                   = v_mem_size / NR_CONSOLES;
-	p_tty->p_console->original_addr      = nr_tty * con_v_mem_size;
-	p_tty->p_console->v_mem_limit        = con_v_mem_size;
+	int con_v_mem_size = v_mem_size / NR_CONSOLES;
+	p_tty->p_console->original_addr = nr_tty * con_v_mem_size;
+	p_tty->p_console->v_mem_limit = con_v_mem_size;
 	p_tty->p_console->current_start_addr = p_tty->p_console->original_addr;
 
 	/* 默认光标位置在最开始处 */
 	p_tty->p_console->cursor = p_tty->p_console->original_addr;
 
-	if (nr_tty == 0) {
+	if (nr_tty == 0)
+	{
 		/* 第一个控制台沿用原来的光标位置 */
 		p_tty->p_console->cursor = disp_pos / 2;
 		disp_pos = 0;
 	}
-	else {
+	else
+	{
 		out_char(p_tty->p_console, nr_tty + '0');
 		out_char(p_tty->p_console, '#');
 	}
@@ -189,3 +191,28 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction)
 	set_cursor(p_con->cursor);
 }
 
+/*===============================
+set single
+===================================*/
+PRIVATE void fill_symbol(u8 *pos, const u8 ch, const u8 color)
+{
+	pos[0] = ch;
+	pos[1] = color;
+}
+/*====================================================
+empty console contents
+===========================*/
+PUBLIC void empty(CONSOLE *p_con)
+{
+	p_con->cursor = p_con->original_addr;
+	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
+	while (p_con->cursor < p_con->original_addr + p_con->v_mem_limit - 1)
+	{
+		fill_symbol(p_vmem, 0x0, DEFAULT_CHAR_COLOR);
+		p_vmem += 2;
+		p_con->cursor++;
+	}
+	p_con->cursor = p_con->original_addr;
+	p_con->current_start_addr = p_con->original_addr;
+	flush(p_con);
+}

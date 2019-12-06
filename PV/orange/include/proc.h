@@ -39,6 +39,11 @@ typedef struct s_proc {
 
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */
+
+    int sleep_ticks; 
+	int is_wait;
+	struct s_proc* next 
+
 }PROCESS;
 
 typedef struct s_task {
@@ -47,6 +52,11 @@ typedef struct s_task {
 	char	name[32];
 }TASK;
 
+//semaphore
+typedef struct semaphore {
+	int value;
+	PROCESS* queue
+}SEMAPHORE;
 
 /* Number of tasks & procs */
 #define NR_TASKS	1

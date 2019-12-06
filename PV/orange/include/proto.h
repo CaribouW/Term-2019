@@ -49,6 +49,9 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
 
 /* proc.c */
 PUBLIC  int     sys_get_ticks();        /* sys_call */
+PUBLIC  int     sys_disp_str(char* str);
+PUBLIC  int     sys_process_sleep(int milli_sec);  
+
 
 /* syscall.asm */
 PUBLIC  void    sys_call();             /* int_handler */

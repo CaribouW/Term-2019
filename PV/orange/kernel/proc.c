@@ -47,3 +47,29 @@ PUBLIC int sys_get_ticks()
 	return ticks;
 }
 
+/*======================================================================*
+                           sys_disp_str
+ *======================================================================*/
+PUBLIC int sys_disp_str(char *str)
+{
+	//output str
+	char *temp = str;
+	while (*temp != 0)
+	{
+		out_char(current_con, *temp);
+		temp++;
+	}
+
+	return 0;
+}
+
+/*======================================================================*
+                           sys_process_sleep
+ *======================================================================*/
+PUBLIC int sys_process_sleep(int milli_sec)
+{
+	p_proc_ready->sleep_ticks = milli_sec / 10;
+	schedule();
+	return 0;
+}
+

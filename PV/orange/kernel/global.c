@@ -24,9 +24,12 @@ PUBLIC TASK task_table[NR_TASKS] = {
 };
 
 PUBLIC TASK user_proc_table[NR_PROCS] = {
-	{TestA, STACK_SIZE_TESTA, "TestA"},
-	{TestB, STACK_SIZE_TESTB, "TestB"},
-	{TestC, STACK_SIZE_TESTC, "TestC"}};
+	{ReaderA, STACK_SIZE_READER_A, "ReaderA"},
+	{ReaderB, STACK_SIZE_READER_B, "ReaderB"},
+	{ReaderC, STACK_SIZE_READER_C, "ReaderC"},
+	{WriterD, STACK_SIZE_Writer_D, "WriterD"},
+	{WriterE, STACK_SIZE_Writer_E, "WriterE"},
+};
 
 PUBLIC char task_stack[STACK_SIZE_TOTAL];
 

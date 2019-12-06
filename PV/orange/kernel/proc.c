@@ -112,13 +112,13 @@ PUBLIC int sys_P(SEMAPHORE *s)
 	s->value--;
 	if (s->value < 0)
 	{
-		PROCESS* p;
+		PROCESS *p;
 
 		//first we insert current process to wait queue
 		p_proc_ready->is_wait = 1;
 		if (s->queue == 0)
 		{
-			s->queue = p_proc_ready;//let it to wait
+			s->queue = p_proc_ready; //let it to wait
 		}
 		else
 		{
@@ -151,22 +151,21 @@ PUBLIC int sys_V(SEMAPHORE *s)
 	return 0;
 }
 
-
 /*======================================================================*
                            reader
  *======================================================================*/
 PUBLIC void reader(char *name, int len)
 {
 	sys_P(&count_mutex);
+	if (0 > reader_count || reader_count > 3) reader_count = 0;
+	if (0 == reader_count)
 	{
-		if (0 == reader_count)
-		{
-			sys_P(&wrmutex); //block writer;
-		}
-		++reader_count;
+		sys_P(&wrmutex); //block writer;
 	}
+	++reader_count;
 	sys_V(&count_mutex);
 
+	sys_P(&count_mutex);
 	//======read begin===========
 	sys_disp_str(name);
 	sys_disp_str(" begins reading\n");
@@ -176,13 +175,11 @@ PUBLIC void reader(char *name, int len)
 	sys_disp_str(" stops reading\n");
 	//============================
 
-	sys_P(&count_mutex);
-	{
-		//reduce counter
-		--reader_count;
-		if (0 == reader_count)
-			sys_V(&wrmutex); //release block writer
-	}
+	//reduce counter
+	--reader_count;
+	if (0 == reader_count)
+		sys_V(&wrmutex); //release block writer
+
 	sys_V(&count_mutex);
 }
 
@@ -207,9 +204,7 @@ PUBLIC void summary()
 	reader_count = total = 0x0;
 	while (1)
 	{
-		sys_P(&count_mutex);
 		countR();
-		sys_V(&count_mutex);
 		milli_delay(10000);
 	}
 }

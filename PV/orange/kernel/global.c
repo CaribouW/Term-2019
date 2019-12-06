@@ -38,6 +38,6 @@ PUBLIC CONSOLE console_table[NR_CONSOLES];
 
 PUBLIC irq_handler irq_table[NR_IRQ];
 
-PUBLIC system_call sys_call_table[NR_SYS_CALL] = {sys_get_ticks, sys_process_sleep, sys_disp_str};
+PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {sys_get_ticks, sys_process_sleep, sys_disp_str,  sys_P, sys_V};
 
 PUBLIC char colors[NR_COLOR] = {WHITE_COLOR, RED_COLOR, GREEN_COLOR, BLUE_COLOR, 0x03, 0x04, 0x06};

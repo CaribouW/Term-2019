@@ -55,10 +55,13 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
 
 /* proc.c */
 PUBLIC  int     sys_get_ticks();        /* sys_call */
-PUBLIC  int     sys_disp_str(char* str);
-PUBLIC  int     sys_process_sleep(int milli_sec);  
-
-
+PUBLIC      int         sys_process_sleep(int milli_sec);  
+PUBLIC      int 	    sys_disp_str(char* str);
+PUBLIC      int         sys_P(SEMAPHORE* s);
+PUBLIC      int         sys_V(SEMAPHORE* s);
+PUBLIC      void        reader(char *name,int len);
+PUBLIC      void        writer(char *name,int len);
+PUBLIC      void        summary();
 /* syscall.asm */
 PUBLIC  void    sys_call();             /* int_handler */
 PUBLIC  int     get_ticks();

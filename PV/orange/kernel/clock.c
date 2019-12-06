@@ -16,7 +16,7 @@
 #include "proto.h"
 
 PRIVATE const int LIMITATION = 20000; //TIME_COUNTER <= LIMITATION
-PRIVATE int TIME_COUNTER;
+PRIVATE int TIME_COUNTER = 20000;
 PRIVATE int IS_COUNTING;
 /*======================================================================*
                            clock_handler
@@ -26,10 +26,6 @@ PUBLIC void clock_handler(int irq)
 	ticks++;
 	p_proc_ready->ticks--;
 
-        if(IS_COUNTING == 1){
-                IS_COUNTING = !IS_COUNTING;
-                empty(console_table);
-        }
         if(TIME_COUNTER >= LIMITATION){
                 TIME_COUNTER = 0;
                 empty(console_table);
@@ -44,7 +40,7 @@ PUBLIC void clock_handler(int irq)
 	}
 
 	schedule();
-
+        ++TIME_COUNTER;
 }
 
 /*======================================================================*

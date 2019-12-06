@@ -104,7 +104,7 @@ void ReaderA()
 	while (1)
 	{
 		reader("A",2);
-		milli_delay(1000);
+		milli_delay(1);
 	}
 }
 
@@ -126,7 +126,7 @@ void ReaderC()
 {
 	while (1)
 	{
-		// reader("C",3);
+		reader("C",3);
 		milli_delay(1);
 	}
 }

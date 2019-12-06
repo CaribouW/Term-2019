@@ -1,6 +1,5 @@
 {
     "files.associations": {
-        "keyboard.h": "c",
-        "protect.h": "c"
+        "keyboard.h": "c"
     }
 }

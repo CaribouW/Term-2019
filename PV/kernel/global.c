@@ -22,12 +22,12 @@ PUBLIC	PROCESS		proc_table[NR_TASKS];
 PUBLIC	char		task_stack[STACK_SIZE_TOTAL];
 
 PUBLIC	TASK	task_table[NR_TASKS] = {{task_tty, STACK_SIZE_TTY, "tty"},
+										{F, STACK_SIZE_F, "F"},
 					                    {ReaderA, STACK_SIZE_READER_A, "ReaderA"},
 										{ReaderB, STACK_SIZE_READER_B, "ReaderB"},
 										{ReaderC, STACK_SIZE_READER_C, "ReaderC"},
 										{WriterD, STACK_SIZE_Writer_D, "WriterD"},
 										{WriterE, STACK_SIZE_Writer_E, "WriterE"},
-										{F, STACK_SIZE_F, "F"},
 									};
 
 PUBLIC	TTY		tty_table[NR_CONSOLES];

@@ -36,7 +36,7 @@ PUBLIC void task_tty()
 	for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
 		init_tty(p_tty);
 	}
-	select_console(1);
+	select_console(0);
 	while (1) {
 		for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
 			tty_do_read(p_tty);
@@ -148,7 +148,7 @@ PRIVATE void tty_do_write(TTY* p_tty)
 		}
 		p_tty->inbuf_count--;
 
-		out_char(p_tty->p_console, ch, WHITE_COLOR);
+		out_char(p_tty->p_console, ch);
 	}
 }
 

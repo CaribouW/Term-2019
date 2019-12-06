@@ -26,15 +26,11 @@ PRIVATE void set_cursor(unsigned int position);
 PRIVATE void set_video_start_addr(u32 addr);
 PRIVATE void flush(CONSOLE* p_con);
 
-PRIVATE int count;
-PRIVATE TTY* current_tty;
 /*======================================================================*
 			   init_screen
  *======================================================================*/
 PUBLIC void init_screen(TTY* p_tty)
 {
-	count = 0;
-
 	int nr_tty = p_tty - tty_table;
 	p_tty->p_console = console_table + nr_tty;
 
@@ -53,19 +49,10 @@ PUBLIC void init_screen(TTY* p_tty)
 		p_tty->p_console->cursor = disp_pos / 2;
 		disp_pos = 0;
 	}
-
-	//use tty2
-	if (nr_tty == 1){
-        current_con = p_tty->p_console;
-        //use 0 to clear screen
-        u8* p_vmem = (u8*)(V_MEM_BASE + current_con->current_start_addr * 2);
-        for (int i = 0;i <current_con->v_mem_limit;i++){
-            *(p_vmem) = 0;
-            *(p_vmem + 1) = WHITE_COLOR;
-            p_vmem = p_vmem + 2;
-        }
-	current_tty = p_tty;
-    }
+	else {
+		out_char(p_tty->p_console, nr_tty + '0');
+		out_char(p_tty->p_console, '#');
+	}
 
 	set_cursor(p_tty->p_console->cursor);
 }
@@ -83,7 +70,7 @@ PUBLIC int is_current_console(CONSOLE* p_con)
 /*======================================================================*
 			   out_char
  *======================================================================*/
-PUBLIC void out_char(CONSOLE* p_con, char ch, char color)
+PUBLIC void out_char(CONSOLE* p_con, char ch)
 {
 	u8* p_vmem = (u8*)(V_MEM_BASE + p_con->cursor * 2);
 
@@ -100,14 +87,14 @@ PUBLIC void out_char(CONSOLE* p_con, char ch, char color)
 		if (p_con->cursor > p_con->original_addr) {
 			p_con->cursor--;
 			*(p_vmem-2) = ' ';
-			*(p_vmem-1) = WHITE_COLOR;
+			*(p_vmem-1) = DEFAULT_CHAR_COLOR;
 		}
 		break;
 	default:
 		if (p_con->cursor <
 		    p_con->original_addr + p_con->v_mem_limit - 1) {
 			*p_vmem++ = ch;
-			*p_vmem++ = color;
+			*p_vmem++ = DEFAULT_CHAR_COLOR;
 			p_con->cursor++;
 		}
 		break;
@@ -202,14 +189,3 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction)
 	set_cursor(p_con->cursor);
 }
 
-
-PUBLIC void clear_screen(){
-    count++;
-    int time_to_clean = 15; 
-    
-    if(count == 1000){
-	//清屏
-        init_screen(current_tty);
-        count = 0;
-    }
-}

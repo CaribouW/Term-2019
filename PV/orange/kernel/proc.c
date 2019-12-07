@@ -14,7 +14,20 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
+#define READER_LIMIT 1
+#define WRITER
+PRIVATE SEMAPHORE wrmutex = {1, 0}, count_mutex = {1, 0}, print_mutex = {1, 0};
+PRIVATE int reader_count = 0, total = 0;
+PRIVATE char buffer[10];
 
+PRIVATE void countR();
+#ifdef WRITER
+PRIVATE SEMAPHORE writer_first = {1, 0};
+#endif
+
+#ifdef READER_LIMIT
+PRIVATE SEMAPHORE reader_mutex = {0, 0};
+#endif
 /*======================================================================*
                               schedule
  *======================================================================*/
@@ -23,10 +36,24 @@ PUBLIC void schedule()
 	PROCESS *p;
 	int greatest_ticks = 0;
 
+	for (p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; p++)
+	{
+		if (p->sleep_ticks > 0)
+		{
+			p->sleep_ticks--;
+		}
+	}
+
 	while (!greatest_ticks)
 	{
 		for (p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; p++)
 		{
+			//If the process is not ready , go on is_waiting or sleeping
+			if (p->is_wait || p->sleep_ticks)
+			{
+				continue;
+			}
+
 			if (p->ticks > greatest_ticks)
 			{
 				greatest_ticks = p->ticks;
@@ -38,6 +65,11 @@ PUBLIC void schedule()
 		{
 			for (p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; p++)
 			{
+				//If the process is not ready , go on is_waiting or sleeping
+				if (p->is_wait || p->sleep_ticks)
+				{
+					continue;
+				}
 				p->ticks = p->priority;
 			}
 		}
@@ -151,4 +183,75 @@ PUBLIC int printf(const char *fmt, ...)
 	write(buf, i);
 
 	return i;
+}
+
+///========================================================
+
+PUBLIC void summary()
+{
+	reader_count = total = 0x0;
+	while (1)
+	{
+		countR();
+		milli_delay(10000);
+	}
+}
+
+PRIVATE void countR()
+{
+	printf("============Summary============\n");
+	printf("We have ");
+	itoa(buffer, reader_count);
+	printf(buffer);
+	printf(" readers reading\n");
+}
+
+/*======================================================================*
+                           reader
+ *======================================================================*/
+PUBLIC void reader(char *name, int len)
+{
+	sys_P(&count_mutex);
+	{
+		if (0 == reader_count)
+		{
+			sys_P(&wrmutex); //block writer;
+		}
+		++reader_count;
+	}
+	sys_V(&count_mutex);
+
+	//======read begin===========
+	printf(name);
+	printf(" begins reading\n");
+	sys_process_sleep(1000 * len);
+	//stop read
+	printf(name);
+	printf(" stops reading\n");
+	//============================
+
+	sys_P(&count_mutex);
+	{
+		//reduce counter
+		--reader_count;
+		if (0 == reader_count)
+			sys_V(&wrmutex); //release block writer
+	}
+	sys_V(&count_mutex);
+}
+
+/*======================================================================*
+                           writer
+ *======================================================================*/
+PUBLIC void writer(char *name, int len)
+{
+	sys_P(&wrmutex);
+	//Begin read
+	printf(name);
+	printf(" begins writing\n");
+	sys_process_sleep(1000 * len);
+	//stop read
+	printf(name);
+	printf(" stops writing\n");
+	sys_V(&wrmutex);
 }

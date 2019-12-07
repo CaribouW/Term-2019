@@ -22,9 +22,10 @@ PUBLIC void	delay(int time);
 void restart();
 
 /* main.c */
-void TestA();
-void TestB();
-void TestC();
+void ReaderA();
+void ReaderB();
+void ReaderC();
+void F();
 
 /* i8259.c */
 PUBLIC void put_irq_handler(int irq, irq_handler handler);
@@ -69,3 +70,6 @@ PUBLIC      int         sys_P(SEMAPHORE* s);
 PUBLIC      int         sys_V(SEMAPHORE* s);
 PUBLIC      void        reader(char *name,int len);
 PUBLIC      void        writer(char *name,int len);
+
+//
+void summary();

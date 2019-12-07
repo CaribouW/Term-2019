@@ -189,7 +189,6 @@ PUBLIC int printf(const char *fmt, ...)
 
 PUBLIC void summary()
 {
-	reader_count = total = 0x0;
 	while (1)
 	{
 		countR();
@@ -213,6 +212,7 @@ PUBLIC void reader(char *name, int len)
 {
 	sys_P(&count_mutex);
 	{
+		if (0>reader_count) reader_count = 0;
 		if (0 == reader_count)
 		{
 			sys_P(&wrmutex); //block writer;
@@ -224,7 +224,7 @@ PUBLIC void reader(char *name, int len)
 	//======read begin===========
 	printf(name);
 	printf(" begins reading\n");
-	sys_process_sleep(10000 * len);
+	milli_delay(10000 * len);
 	//stop read
 	printf(name);
 	printf(" stops reading\n");
@@ -239,6 +239,7 @@ PUBLIC void reader(char *name, int len)
 			sys_V(&wrmutex); //release block writer
 	}
 	sys_V(&count_mutex);
+	milli_delay(10000);
 }
 
 /*======================================================================*
@@ -250,9 +251,10 @@ PUBLIC void writer(char *name, int len)
 	//Begin read
 	printf(name);
 	printf(" begins writing\n");
-	sys_process_sleep(10000 * len);
+	milli_delay(10000 * len);
 	//stop read
 	printf(name);
 	printf(" stops writing\n");
 	sys_V(&wrmutex);
+	milli_delay(10000);
 }

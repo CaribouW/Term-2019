@@ -25,12 +25,6 @@ void restart();
 void TestA();
 void TestB();
 void TestC();
-void ReaderA();
-void ReaderB();
-void ReaderC();
-void WriterD();
-void WriterE();
-void F();
 
 /* i8259.c */
 PUBLIC void put_irq_handler(int irq, irq_handler handler);
@@ -51,18 +45,22 @@ PUBLIC void in_process(TTY* p_tty, u32 key);
 PUBLIC void out_char(CONSOLE* p_con, char ch);
 PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
 
+/* printf.c */
+PUBLIC  int     printf(const char *fmt, ...);
+
+/* vsprintf.c */
+PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);
+
 /* 以下是系统调用相关 */
 
+/* 系统调用 - 系统级 */
 /* proc.c */
-PUBLIC  int     sys_get_ticks();        /* sys_call */
-PUBLIC      int         sys_process_sleep(int milli_sec);  
-PUBLIC      int 	    sys_disp_str(char* str);
-PUBLIC      int         sys_P(SEMAPHORE* s);
-PUBLIC      int         sys_V(SEMAPHORE* s);
-PUBLIC      void        reader(char *name,int len);
-PUBLIC      void        writer(char *name,int len);
-PUBLIC      void        summary();
+PUBLIC  int     sys_get_ticks();
+PUBLIC  int     sys_write(char* buf, int len, PROCESS* p_proc);
 /* syscall.asm */
 PUBLIC  void    sys_call();             /* int_handler */
+
+/* 系统调用 - 用户级 */
 PUBLIC  int     get_ticks();
+PUBLIC  void    write(char* buf, int len);
 

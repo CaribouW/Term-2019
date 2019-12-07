@@ -97,9 +97,6 @@
 #define	AT_WINI_IRQ	14	/* at winchester */
 
 /* system call */
-#define NR_SYS_CALL     5
-
-/* color amount*/
-#define NR_COLOR        7
+#define NR_SYS_CALL     2
 
 #endif /* _ORANGES_CONST_H_ */

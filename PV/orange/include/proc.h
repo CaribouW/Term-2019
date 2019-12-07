@@ -40,10 +40,7 @@ typedef struct s_proc {
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */
 
-    int sleep_ticks; 
-	int is_wait;
-	struct s_proc* next 
-
+	int nr_tty;
 }PROCESS;
 
 typedef struct s_task {
@@ -52,30 +49,19 @@ typedef struct s_task {
 	char	name[32];
 }TASK;
 
-//semaphore
-typedef struct semaphore {
-	int value;
-	PROCESS* queue
-}SEMAPHORE;
 
 /* Number of tasks & procs */
-#define NR_TASKS	2
-#define NR_PROCS	5
+#define NR_TASKS	1
+#define NR_PROCS	3
 
 /* stacks of tasks */
 #define STACK_SIZE_TTY		0x8000
-#define STACK_SIZE_READER_A	0x8000
-#define STACK_SIZE_READER_B	0x8000
-#define STACK_SIZE_READER_C	0x8000
-#define STACK_SIZE_Writer_D	0x8000
-#define STACK_SIZE_Writer_E	0x8000
-#define STACK_SIZE_F		0x8000
+#define STACK_SIZE_TESTA	0x8000
+#define STACK_SIZE_TESTB	0x8000
+#define STACK_SIZE_TESTC	0x8000
 
 #define STACK_SIZE_TOTAL	(STACK_SIZE_TTY + \
-				STACK_SIZE_READER_A + \
-				STACK_SIZE_READER_B + \
-				STACK_SIZE_READER_C + \
-				STACK_SIZE_Writer_D + \
-				STACK_SIZE_Writer_E + \
-				STACK_SIZE_F)
+				STACK_SIZE_TESTA + \
+				STACK_SIZE_TESTB + \
+				STACK_SIZE_TESTC)
 

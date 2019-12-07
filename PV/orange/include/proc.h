@@ -62,7 +62,7 @@ typedef struct s_task {
 
 /* Number of tasks & procs */
 #define NR_TASKS	2
-#define NR_PROCS	3
+#define NR_PROCS	5
 
 /* stacks of tasks */
 #define STACK_SIZE_TTY		0x8000
@@ -76,5 +76,8 @@ typedef struct s_task {
 #define STACK_SIZE_TOTAL	(STACK_SIZE_TTY + \
 				STACK_SIZE_READER_A + \
 				STACK_SIZE_READER_B + \
-				STACK_SIZE_READER_C)
+				STACK_SIZE_READER_C + \
+				STACK_SIZE_Writer_D + \
+				STACK_SIZE_Writer_E + \
+				STACK_SIZE_F)
 

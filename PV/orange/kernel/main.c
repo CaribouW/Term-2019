@@ -15,7 +15,6 @@
 #include "global.h"
 #include "proto.h"
 
-
 /*======================================================================*
                             kernel_main
  *======================================================================*/
@@ -78,14 +77,22 @@ PUBLIC int kernel_main()
 		selector_ldt += 1 << 3;
 	}
 
-	proc_table[0].ticks = proc_table[0].priority = 15;
-	proc_table[1].ticks = proc_table[1].priority = 5;
-	proc_table[2].ticks = proc_table[2].priority = 5;
-	proc_table[3].ticks = proc_table[3].priority = 5;
+	for (int i = 1; i < NR_TASKS + NR_PROCS; ++i)
+	{
+		proc_table[i].ticks = proc_table[i].priority = 1;
+		proc_table[i].nr_tty = 0;
+	}
 
-	proc_table[1].nr_tty = 0;
-	proc_table[2].nr_tty = 0;
-	proc_table[3].nr_tty = 0;
+	// proc_table[0].ticks = proc_table[0].priority = 15;
+	// proc_table[1].ticks = proc_table[1].priority = 5;
+	// proc_table[2].ticks = proc_table[2].priority = 5;
+	// proc_table[3].ticks = proc_table[3].priority = 5;
+	// proc_table[4].ticks = proc_table[4].priority = 5;
+
+	// proc_table[1].nr_tty = 0;
+	// proc_table[2].nr_tty = 0;
+	// proc_table[3].nr_tty = 0;
+	// proc_table[4].nr_tty = 0;
 
 	k_reenter = 0;
 	ticks = 0;
@@ -110,9 +117,7 @@ void ReaderA()
 	int i = 0;
 	while (1)
 	{
-		printf("A", get_ticks());
-		sys_process_sleep(2000);
-		// milli_delay(2);
+		reader("A", 2);
 	}
 }
 
@@ -123,8 +128,7 @@ void ReaderB()
 {
 	while (1)
 	{
-		printf("B", get_ticks());
-		sys_process_sleep(2000);
+		// reader("B", 2);
 	}
 }
 
@@ -135,16 +139,38 @@ void ReaderC()
 {
 	while (1)
 	{
-		printf("C", get_ticks());
-		sys_process_sleep(2000);
 	}
 }
 
+
+/*======================================================================*
+                               WriterD
+ *======================================================================*/
+void WriterD()
+{
+	while (1)
+	{
+		writer("D",3);
+		// milli_delay(1);
+
+	}
+}
+
+/*======================================================================*
+                               WriterE
+ *======================================================================*/
+void WriterE()
+{
+	while (1)
+	{
+		// writer("E",2);
+		// milli_delay(1);
+	}
+}
 /*======================================================================*
                                F
  *======================================================================*/
 void F()
 {
-
 	summary();
 }

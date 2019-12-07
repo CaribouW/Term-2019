@@ -224,10 +224,11 @@ PUBLIC void reader(char *name, int len)
 	//======read begin===========
 	printf(name);
 	printf(" begins reading\n");
-	sys_process_sleep(1000 * len);
+	sys_process_sleep(10000 * len);
 	//stop read
 	printf(name);
 	printf(" stops reading\n");
+
 	//============================
 
 	sys_P(&count_mutex);
@@ -249,7 +250,7 @@ PUBLIC void writer(char *name, int len)
 	//Begin read
 	printf(name);
 	printf(" begins writing\n");
-	sys_process_sleep(1000 * len);
+	sys_process_sleep(10000 * len);
 	//stop read
 	printf(name);
 	printf(" stops writing\n");

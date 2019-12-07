@@ -25,6 +25,8 @@ void restart();
 void ReaderA();
 void ReaderB();
 void ReaderC();
+void WriterD();
+void WriterE();
 void F();
 
 /* i8259.c */

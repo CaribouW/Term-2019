@@ -64,3 +64,8 @@ PUBLIC  void    sys_call();             /* int_handler */
 PUBLIC  int     get_ticks();
 PUBLIC  void    write(char* buf, int len);
 
+PUBLIC      int         sys_process_sleep(int milli_sec);  
+PUBLIC      int         sys_P(SEMAPHORE* s);
+PUBLIC      int         sys_V(SEMAPHORE* s);
+PUBLIC      void        reader(char *name,int len);
+PUBLIC      void        writer(char *name,int len);

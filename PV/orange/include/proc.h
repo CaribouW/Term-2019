@@ -41,7 +41,17 @@ typedef struct s_proc {
 	char p_name[16];           /* name of the process */
 
 	int nr_tty;
+
+	    int sleep_ticks; 
+	int is_wait;
+	struct s_proc* next 
 }PROCESS;
+
+//semaphore
+typedef struct semaphore {
+	int value;
+	PROCESS* queue
+}SEMAPHORE;
 
 typedef struct s_task {
 	task_f	initial_eip;

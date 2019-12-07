@@ -25,16 +25,16 @@ PUBLIC void clock_handler(int irq)
 {
         ticks++;
         p_proc_ready->ticks--;
-        // if (IS_COUNTING == 1)
-        // {
-        //         IS_COUNTING = !IS_COUNTING;
-        //         empty(console_table);
-        // }
-        // if (TIME_COUNTER >= LIMITATION)
-        // {
-        //         TIME_COUNTER = 0;
-        //         empty(console_table);
-        // }
+        if (IS_COUNTING == 1)
+        {
+                IS_COUNTING = !IS_COUNTING;
+                empty(console_table);
+        }
+        if (TIME_COUNTER >= LIMITATION)
+        {
+                TIME_COUNTER = 0;
+                empty(console_table);
+        }
 
         if (k_reenter != 0)
         {

@@ -233,19 +233,16 @@ empty console contents
 ===========================*/
 PUBLIC void empty(CONSOLE *p_con)
 {
-	for (int i = 0; i < NR_CONSOLES; ++i)
+	p_con->cursor = p_con->original_addr;
+	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
+	while (p_con->cursor < p_con->original_addr + p_con->v_mem_limit - 1)
 	{
-		p_con->cursor = p_con->original_addr;
-		u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
-		while (p_con->cursor < p_con->original_addr + p_con->v_mem_limit - 1)
-		{
-			fill_symbol(p_vmem, 0x0, DEFAULT_CHAR_COLOR);
-			p_vmem += 2;
-			p_con->cursor++;
-		}
-		p_con->cursor = p_con->original_addr;
-		p_con->current_start_addr = p_con->original_addr;
-		flush(p_con);
-		++p_con;
+		fill_symbol(p_vmem, 0x0, DEFAULT_CHAR_COLOR);
+		p_vmem += 2;
+		p_con->cursor++;
 	}
+	p_con->cursor = p_con->original_addr;
+	p_con->current_start_addr = p_con->original_addr;
+	flush(p_con);
+	++p_con;
 }

@@ -148,7 +148,7 @@ PRIVATE void tty_do_write(TTY* p_tty)
 		}
 		p_tty->inbuf_count--;
 
-		out_char(p_tty->p_console, ch);
+		out_char(p_tty->p_console, ch,WHITE_COLOR);
 	}
 }
 
@@ -161,7 +161,7 @@ PUBLIC void tty_write(TTY* p_tty, char* buf, int len)
         int i = len;
 
         while (i) {
-                out_char(p_tty->p_console, *p++);
+                out_char(p_tty->p_console, *p++,WHITE_COLOR);
                 i--;
         }
 }

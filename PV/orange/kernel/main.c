@@ -81,8 +81,8 @@ PUBLIC int kernel_main()
 	proc_table[3].ticks = proc_table[3].priority =  5;
 
         proc_table[1].nr_tty = 0;
-        proc_table[2].nr_tty = 1;
-        proc_table[3].nr_tty = 1;
+        proc_table[2].nr_tty = 0;
+        proc_table[3].nr_tty = 0;
 
 	k_reenter = 0;
 	ticks = 0;

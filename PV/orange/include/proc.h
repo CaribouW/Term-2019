@@ -56,12 +56,15 @@ typedef struct s_task {
 
 /* stacks of tasks */
 #define STACK_SIZE_TTY		0x8000
-#define STACK_SIZE_TESTA	0x8000
-#define STACK_SIZE_TESTB	0x8000
-#define STACK_SIZE_TESTC	0x8000
+#define STACK_SIZE_READER_A	0x8000
+#define STACK_SIZE_READER_B	0x8000
+#define STACK_SIZE_READER_C	0x8000
+#define STACK_SIZE_Writer_D	0x8000
+#define STACK_SIZE_Writer_E	0x8000
+#define STACK_SIZE_F		0x8000
 
 #define STACK_SIZE_TOTAL	(STACK_SIZE_TTY + \
-				STACK_SIZE_TESTA + \
-				STACK_SIZE_TESTB + \
-				STACK_SIZE_TESTC)
+				STACK_SIZE_READER_A + \
+				STACK_SIZE_READER_B + \
+				STACK_SIZE_READER_C)
 

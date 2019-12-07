@@ -14,7 +14,6 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
-
 #define READER_LIMIT 1
 #define WRITER
 PRIVATE SEMAPHORE wrmutex = {1, 0}, count_mutex = {1, 0}, print_mutex = {1, 0};
@@ -37,8 +36,7 @@ PUBLIC void schedule()
 	PROCESS *p;
 	int greatest_ticks = 0;
 
-	//counting down sleep period
-	for (p = proc_table; p < proc_table + NR_TASKS; p++)
+	for (p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; p++)
 	{
 		if (p->sleep_ticks > 0)
 		{
@@ -48,14 +46,14 @@ PUBLIC void schedule()
 
 	while (!greatest_ticks)
 	{
-
-		for (p = proc_table; p < proc_table + NR_TASKS; p++)
+		for (p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; p++)
 		{
 			//If the process is not ready , go on is_waiting or sleeping
 			if (p->is_wait || p->sleep_ticks)
 			{
 				continue;
 			}
+
 			if (p->ticks > greatest_ticks)
 			{
 				greatest_ticks = p->ticks;
@@ -65,7 +63,7 @@ PUBLIC void schedule()
 
 		if (!greatest_ticks)
 		{
-			for (p = proc_table; p < proc_table + NR_TASKS; p++)
+			for (p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; p++)
 			{
 				//If the process is not ready , go on is_waiting or sleeping
 				if (p->is_wait || p->sleep_ticks)
@@ -85,7 +83,6 @@ PUBLIC int sys_get_ticks()
 {
 	return ticks;
 }
-
 /*======================================================================*
                            sys_process_sleep
  *======================================================================*/
@@ -95,26 +92,6 @@ PUBLIC int sys_process_sleep(int milli_sec)
 	schedule();
 	return 0;
 }
-
-/*======================================================================*
-                           sys_disp_str
- *======================================================================*/
-PUBLIC int sys_disp_str(char *str)
-{
-	//choose color for each process
-	char color = colors[p_proc_ready - proc_table - 1];
-
-	//output str
-	char *temp = str;
-	while (*temp != 0)
-	{
-		out_char(current_con, *temp, WHITE_COLOR);
-		temp++;
-	}
-
-	return 0;
-}
-
 /*======================================================================*
                            sys_P
  *======================================================================*/
@@ -123,13 +100,13 @@ PUBLIC int sys_P(SEMAPHORE *s)
 	s->value--;
 	if (s->value < 0)
 	{
-		PROCESS* p;
+		PROCESS *p;
 
 		//first we insert current process to wait queue
 		p_proc_ready->is_wait = 1;
 		if (s->queue == 0)
 		{
-			s->queue = p_proc_ready;//let it to wait
+			s->queue = p_proc_ready; //let it to wait
 		}
 		else
 		{
@@ -162,6 +139,72 @@ PUBLIC int sys_V(SEMAPHORE *s)
 	return 0;
 }
 
+int vsprintf(char *buf, const char *fmt, va_list args)
+{
+	char *p;
+	char tmp[256];
+	va_list p_next_arg = args;
+
+	for (p = buf; *fmt; fmt++)
+	{
+		if (*fmt != '%')
+		{
+			*p++ = *fmt;
+			continue;
+		}
+
+		fmt++;
+
+		switch (*fmt)
+		{
+		case 'x':
+			itoa(tmp, *((int *)p_next_arg));
+			strcpy(p, tmp);
+			p_next_arg += 4;
+			p += strlen(tmp);
+			break;
+		case 's':
+			break;
+		default:
+			break;
+		}
+	}
+
+	return (p - buf);
+}
+
+PUBLIC int printf(const char *fmt, ...)
+{
+	int i;
+	char buf[256];
+
+	va_list arg = (va_list)((char *)(&fmt) + 4); /*4是参数fmt所占堆栈中的大小*/
+	i = vsprintf(buf, fmt, arg);
+	write(buf, i);
+
+	return i;
+}
+
+///========================================================
+
+PUBLIC void summary()
+{
+	while (1)
+	{
+		countR();
+		milli_delay(10000);
+	}
+}
+
+PRIVATE void countR()
+{
+	printf("============Summary============\n");
+	printf("We have ");
+	itoa(buffer, reader_count);
+	printf(buffer);
+	printf(" readers reading\n");
+}
+
 /*======================================================================*
                            reader
  *======================================================================*/
@@ -169,6 +212,7 @@ PUBLIC void reader(char *name, int len)
 {
 	sys_P(&count_mutex);
 	{
+		if (0>reader_count) reader_count = 0;
 		if (0 == reader_count)
 		{
 			sys_P(&wrmutex); //block writer;
@@ -178,12 +222,13 @@ PUBLIC void reader(char *name, int len)
 	sys_V(&count_mutex);
 
 	//======read begin===========
-	sys_disp_str(name);
-	sys_disp_str(" begins reading\n");
+	printf(name);
+	printf(" begins reading\n");
 	milli_delay(10000 * len);
 	//stop read
-	sys_disp_str(name);
-	sys_disp_str(" stops reading\n");
+	printf(name);
+	printf(" stops reading\n");
+
 	//============================
 
 	sys_P(&count_mutex);
@@ -194,6 +239,7 @@ PUBLIC void reader(char *name, int len)
 			sys_V(&wrmutex); //release block writer
 	}
 	sys_V(&count_mutex);
+	milli_delay(10000);
 }
 
 /*======================================================================*
@@ -203,32 +249,12 @@ PUBLIC void writer(char *name, int len)
 {
 	sys_P(&wrmutex);
 	//Begin read
-	sys_disp_str(name);
-	sys_disp_str(" begins writing\n");
+	printf(name);
+	printf(" begins writing\n");
 	milli_delay(10000 * len);
 	//stop read
-	sys_disp_str(name);
-	sys_disp_str(" stops writing\n");
+	printf(name);
+	printf(" stops writing\n");
 	sys_V(&wrmutex);
-}
-
-PUBLIC void summary()
-{
-	reader_count = total = 0x0;
-	while (1)
-	{
-		sys_P(&count_mutex);
-		countR();
-		sys_V(&count_mutex);
-		milli_delay(10000);
-	}
-}
-
-PRIVATE void countR()
-{
-	sys_disp_str("============Summary============\n");
-	sys_disp_str("We have ");
-	itoa(buffer, reader_count);
-	sys_disp_str(buffer);
-	sys_disp_str(" readers reading\n");
+	milli_delay(10000);
 }

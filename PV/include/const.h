@@ -99,7 +99,4 @@
 /* system call */
 #define NR_SYS_CALL     5
 
-/* color amount*/
-#define NR_COLOR        7
-
 #endif /* _ORANGES_CONST_H_ */

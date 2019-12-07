@@ -26,7 +26,7 @@ PRIVATE SEMAPHORE writer_first = {1, 0};
 #endif
 
 #ifdef READER_LIMIT
-PRIVATE SEMAPHORE reader_mutex = {0, 0};
+PRIVATE SEMAPHORE reader_mutex = {READER_LIMIT, 0};
 #endif
 /*======================================================================*
                               schedule
@@ -210,38 +210,36 @@ PRIVATE void countR()
  *======================================================================*/
 PUBLIC void reader(char *name, int len)
 {
-	sys_P(&reader_mutex);
-		sys_P(&count_mutex);
+	sys_P(&count_mutex);
+	{
+		if (0>reader_count) reader_count = 0;
+		if (0 == reader_count)
 		{
-			if (0>reader_count) reader_count = 0;
-			if (0 == reader_count)
-			{
-				sys_P(&wrmutex); //block writer;
-			}
-			++reader_count;
+			sys_P(&wrmutex); //block writer;
 		}
-		sys_V(&count_mutex);
+		++reader_count;
+	}
+	sys_V(&count_mutex);
 
-		//======read begin===========
-		printf(name);
-		printf(" begins reading\n");
-		milli_delay(10000 * len);
-		//stop read
-		printf(name);
-		printf(" stops reading\n");
+	//======read begin===========
+	printf(name);
+	printf(" begins reading\n");
+	milli_delay(10000 * len);
+	//stop read
+	printf(name);
+	printf(" stops reading\n");
 
-		//============================
+	//============================
 
-		sys_P(&count_mutex);
-		{
-			//reduce counter
-			--reader_count;
-			if (0 == reader_count)
-				sys_V(&wrmutex); //release block writer
-		}
-		sys_V(&count_mutex);
-		milli_delay(10000);
-	sys_V(&reader_mutex);
+	sys_P(&count_mutex);
+	{
+		//reduce counter
+		--reader_count;
+		if (0 == reader_count)
+			sys_V(&wrmutex); //release block writer
+	}
+	sys_V(&count_mutex);
+	milli_delay(10000);
 }
 
 /*======================================================================*

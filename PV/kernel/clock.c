@@ -15,7 +15,7 @@
 #include "global.h"
 #include "proto.h"
 
-PRIVATE const int LIMITATION = 20000; //TIME_COUNTER <= LIMITATION
+PRIVATE const int LIMITATION = 10000; //TIME_COUNTER <= LIMITATION
 PRIVATE int TIME_COUNTER;
 PRIVATE int IS_COUNTING;
 /*======================================================================*
@@ -45,6 +45,7 @@ PUBLIC void clock_handler(int irq)
         {
                 return;
         }
+        ++TIME_COUNTER;
         schedule();
 }
 

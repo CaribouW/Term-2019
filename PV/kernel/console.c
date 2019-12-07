@@ -88,7 +88,7 @@ PUBLIC void out_char(CONSOLE *p_con, char ch, char color)
 	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2);
 
 	if (p_con->cursor >=
-		p_con->original_addr + p_con->v_mem_limit - 1)
+		p_con->original_addr + p_con->v_mem_limit - 10)
 	{
 		//清屏
 		init_screen(current_tty);

@@ -79,7 +79,7 @@ PUBLIC int kernel_main()
 
 	for (int i = 1; i < NR_TASKS + NR_PROCS; ++i)
 	{
-		proc_table[i].ticks = proc_table[i].priority = 1;
+		proc_table[i].ticks = proc_table[i].priority = 10;
 		proc_table[i].nr_tty = 0;
 	}
 
@@ -151,9 +151,7 @@ void WriterD()
 {
 	while (1)
 	{
-		// writer("D",3);
-		// milli_delay(1);
-
+		writer("D",3);
 	}
 }
 

@@ -27,7 +27,9 @@ PUBLIC CONSOLE *current_con;
 #define DEFAULT_CHAR_COLOR 0x07 /* 0000 0111 黑底白字 */
 #define WHITE_COLOR 0x07		/* 0000 0111 黑底白字 */
 #define RED_COLOR 0x05			/* 0000 0101 黑底洋红字 */
+#define PURE_RED_COLOR 0x04			/* 0000 0100 黑底红字 */
+#define PURE_BLUE_COLOR 0x03	/* 0000 0011 blue */
 #define GREEN_COLOR 0x02		/* 0000 0010 黑底绿字 */
 #define BLUE_COLOR 0x01			/* 0000 0001 黑底蓝字 */
-
+EXTERN int cur_color;
 #endif /* _ORANGES_CONSOLE_H_ */

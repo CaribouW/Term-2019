@@ -15,8 +15,8 @@
 #include "global.h"
 #include "proto.h"
 
-#define READER_LIMIT 2
-// #define WRITER
+#define READER_LIMIT 3
+#define WRITER
 //=================================
 PRIVATE SEMAPHORE wrmutex = {1, 0}, count_mutex = {1, 0}, print_mutex = {1, 0};
 PRIVATE int reader_count = 0, total = 0;
@@ -205,14 +205,16 @@ PUBLIC void summary()
 
 PRIVATE void countR()
 {
+	cur_color = PURE_RED_COLOR;
+	printf("============Summary============\n");
 	if (0 == reader_count)
 	{
-		printf("============Summary============\n");
+		cur_color = 0x0C;
 		printf("Now is writing\n");
 	}
 	else
 	{
-		printf("============Summary============\n");
+		cur_color = 0x0D;
 		printf("We have ");
 		itoa(buffer, reader_count);
 		printf(buffer);
@@ -247,12 +249,15 @@ PUBLIC void reader(char *name, int len)
 	sys_V(&writer_first);
 #endif
 	//======read begin===========
+	cur_color = GREEN_COLOR;
 	printf(name);
 	printf(" begins reading\n");
 	milli_delay(10000 * len);
 	//stop read
+	cur_color = WHITE_COLOR;
 	printf(name);
 	printf(" stops reading\n");
+
 	//============================
 
 	sys_P(&count_mutex);
@@ -283,17 +288,19 @@ PUBLIC void writer(char *name, int len)
 	++writer_count;
 #endif
 	//Begin read
+	cur_color = PURE_BLUE_COLOR;
 	printf(name);
 	printf(" begins writing\n");
 	milli_delay(10000 * len);
 	//stop read
+	cur_color = RED_COLOR;
 	printf(name);
 	printf(" stops writing\n");
 #ifdef WRITER
 	--writer_count;
 	if (writer_count == 0)
 		sys_V(&writer_first);
+	milli_delay(10);
 #endif
 	sys_V(&wrmutex);
-	milli_delay(1);
 }

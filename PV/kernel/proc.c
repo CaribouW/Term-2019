@@ -14,8 +14,10 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
-#define READER_LIMIT 3
+
+#define READER_LIMIT 2
 #define WRITER
+//=================================
 PRIVATE SEMAPHORE wrmutex = {1, 0}, count_mutex = {1, 0}, print_mutex = {1, 0};
 PRIVATE int reader_count = 0, total = 0;
 PRIVATE char buffer[10];
@@ -23,6 +25,7 @@ PRIVATE char buffer[10];
 PRIVATE void countR();
 #ifdef WRITER
 PRIVATE SEMAPHORE writer_first = {1, 0};
+PRIVATE int writer_count = 0;
 #endif
 
 #ifdef READER_LIMIT
@@ -222,7 +225,12 @@ PRIVATE void countR()
  *======================================================================*/
 PUBLIC void reader(char *name, int len)
 {
+#ifdef WRITER
+	sys_P(&writer_first);
+#endif
+#ifdef READER_LIMIT
 	sys_P(&reader_mutex);
+#endif
 	sys_P(&count_mutex);
 	{
 		// milli_delay(1);
@@ -235,7 +243,9 @@ PUBLIC void reader(char *name, int len)
 		++reader_count;
 	}
 	sys_V(&count_mutex);
-
+#ifdef WRITER
+	sys_V(&writer_first);
+#endif
 	//======read begin===========
 	printf(name);
 	printf(" begins reading\n");
@@ -254,7 +264,9 @@ PUBLIC void reader(char *name, int len)
 	}
 	sys_V(&count_mutex);
 	milli_delay(10000);
+#ifdef READER_LIMIT
 	sys_V(&reader_mutex);
+#endif
 }
 
 /*======================================================================*
@@ -263,6 +275,13 @@ PUBLIC void reader(char *name, int len)
 PUBLIC void writer(char *name, int len)
 {
 	sys_P(&wrmutex);
+#ifdef WRITER
+	if (0 == writer_count)
+	{
+		sys_P(&writer_first);
+	}
+	++writer_count;
+#endif
 	//Begin read
 	printf(name);
 	printf(" begins writing\n");
@@ -270,6 +289,11 @@ PUBLIC void writer(char *name, int len)
 	//stop read
 	printf(name);
 	printf(" stops writing\n");
+#ifdef WRITER
+	--writer_count;
+	if (writer_count == 0)
+		sys_V(&writer_first);
+#endif
 	sys_V(&wrmutex);
-	milli_delay(10000);
+	milli_delay(1);
 }

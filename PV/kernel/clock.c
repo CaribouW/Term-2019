@@ -15,8 +15,8 @@
 #include "global.h"
 #include "proto.h"
 
-PRIVATE const int LIMITATION = 1000; //TIME_COUNTER <= LIMITATION
-PRIVATE int TIME_COUNTER = 1000;
+PRIVATE const int LIMITATION = 850; //TIME_COUNTER <= LIMITATION
+PRIVATE int TIME_COUNTER = 850;
 PRIVATE int IS_COUNTING;
 /*======================================================================*
                            clock_handler

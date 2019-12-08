@@ -16,7 +16,7 @@
 #include "proto.h"
 
 #define READER_LIMIT 2
-#define WRITER
+// #define WRITER
 //=================================
 PRIVATE SEMAPHORE wrmutex = {1, 0}, count_mutex = {1, 0}, print_mutex = {1, 0};
 PRIVATE int reader_count = 0, total = 0;

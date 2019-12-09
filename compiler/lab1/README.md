@@ -1,4 +1,4 @@
-ab
-aabb
-a
-aaaaabbb
+12a
+a312
+123123
+aaaabbb

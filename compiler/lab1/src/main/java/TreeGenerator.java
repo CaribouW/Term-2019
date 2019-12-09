@@ -38,6 +38,7 @@ public class TreeGenerator {
                     stack.push(f);
                 } else {
                     FANode f2 = null, f1 = null;
+
                     switch (ch) {
                         case dot:
                             f2 = stack.pop();
@@ -70,6 +71,27 @@ public class TreeGenerator {
         }
         //merge the node list to a single graph
         return root;
+    }
+
+    /**
+     * Use dfs to find the last one
+     */
+    private static FANode DFS(FANode root) {
+        if (root.edgeFANodeMap.size() == 0) {
+            return root;
+        }
+        FANode ans;
+        for (String nodeKey : root.edgeFANodeMap.keySet()) {//for every edge out ward
+            for (FANode cur : root.edgeFANodeMap.get(nodeKey)) {
+                if (!dfsVisited.contains(cur)) {
+                    dfsVisited.add(cur);
+                    ans = DFS(cur);
+                    if (ans != null)
+                        return ans;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -114,15 +136,22 @@ public class TreeGenerator {
                 stack.push(ch);
             } else {
                 char top = stack.peek();
-                if (outPriority.get(top) == outPriority.get(ch)) {
-                    sb.append(top).append(ch);
-                } else if (top == '(' && ch == ')') {
+                if (ch == ')') {
+                    while (stack.peek() != '(') {
+                        sb.append(stack.pop());
+                    }
+                    stack.pop();
                 } else if (outPriority.get(top) < outPriority.get(ch)) {
                     stack.push(ch);
-                } else if (outPriority.get(top) > outPriority.get(ch)) {
-                    stack.pop();
-                    sb.append(top);
-                    continue;
+                } else if (outPriority.get(top) >= outPriority.get(ch)) {
+                    while (!stack.empty() &&
+                            outPriority.get(stack.peek()) >= outPriority.get(ch)) {
+                        char c = stack.pop();
+                        if (c == '(')
+                            break;
+                        sb.append(c);
+                    }
+                    stack.push(ch);
                 }
             }
             ++index;
@@ -145,52 +174,35 @@ public class TreeGenerator {
 
     //a.b
     private static FANode connectNode(FANode f1, FANode f2) {
-        for (String key : f1.edgeFANodeMap.keySet()) {
-            List<FANode> faNodes = f1.edgeFANodeMap.get(key);
-            if (1 == faNodes.size()) {
-                faNodes.get(0).insertNext(epsilon, f2);
-            }
-            //.insertNext(epsilon, f2)
-            break;
-        }
+        if (dfsVisited == null || dfsVisited.size() != 0)
+            dfsVisited = new HashSet<>();
+        FANode f1End = DFS(f1);
+        f1End.insertNext(epsilon, f2);
         return f1;
     }
 
     //a|b
     private static FANode orNode(FANode f1, FANode f2) {
+        if (dfsVisited == null || dfsVisited.size() != 0)
+            dfsVisited = new HashSet<>();
         FANode begin = new FANode(String.valueOf(NodeCounter++), false);
         FANode end = new FANode(String.valueOf(NodeCounter++), false);
+        //end
+        FANode end1 = DFS(f1), end2 = DFS(f2);
         //begin
         begin.insertNext(epsilon, f1);
         begin.insertNext(epsilon, f2);
-        //end
-        for (String key : f1.edgeFANodeMap.keySet()) {
-            List<FANode> faNodes = f1.edgeFANodeMap.get(key);
-            if (1 == faNodes.size()) {
-                faNodes.get(0).insertNext(epsilon, end);
-            }
-            break;
-        }
-        for (String key : f2.edgeFANodeMap.keySet()) {
-            List<FANode> faNodes = f2.edgeFANodeMap.get(key);
-            if (1 == faNodes.size()) {
-                faNodes.get(0).insertNext(epsilon, end);
-            }
-            break;
-        }
+        //end insert
+        end1.insertNext(epsilon, end);
+        end2.insertNext(epsilon, end);
         return begin;
     }
 
     //a*
     private static FANode loopNode(FANode inner) {
-        FANode two = null;
-        for (String key : inner.edgeFANodeMap.keySet()) {
-            List<FANode> faNodes = inner.edgeFANodeMap.get(key);
-            if (1 == faNodes.size()) {
-                two = faNodes.get(0);
-            }
-            break;
-        }
+        if (dfsVisited == null || dfsVisited.size() != 0)
+            dfsVisited = new HashSet<>();
+        FANode two = DFS(inner);
         assert two != null;
         FANode begin = new FANode(String.valueOf(NodeCounter++), false);
         FANode end = new FANode(String.valueOf(NodeCounter++), false);

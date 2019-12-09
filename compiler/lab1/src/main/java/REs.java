@@ -91,9 +91,6 @@ public class REs {
             }
             idSMap.put(strings[0], strings[1]);
         }
-        if (null == idSMap) return;
-        //infix to postfix
-        idSMap.replaceAll((k, v) -> TreeGenerator.infix2PostFix(idSMap.get(k)));
     }
 
 }

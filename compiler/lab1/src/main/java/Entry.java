@@ -21,10 +21,11 @@ public class Entry {
             e.printStackTrace();
         }
         FANode node = TreeGenerator.RE2NFATree(REs.idSMap);
-        //transform
+        //transform the RE to the final optimized DFA
         Transformer.RE2NFA(node, REs.edgeSet);
         Transformer.NFA2DFA();
         Transformer.DFAOptimize();
+        //Conduct reading and analyse the syntax
         try {
             read("README.md");
         } catch (IOException e) {

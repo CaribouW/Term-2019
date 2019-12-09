@@ -1,5 +1,13 @@
+import graph.TreeGenerator;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class REs {
     private static final String orSep = "|";
@@ -36,7 +44,11 @@ public class REs {
 
     public static List<String> genS;
 
+    public static Map<String, String> idSMap = new HashMap<>();
+
     //construct the REs from the given details
+    //TODO: RE to NFA
+    // a | b ,
     static {
         //basic digit and character
         for (int i = 0; i < 9; ++i) {
@@ -71,4 +83,33 @@ public class REs {
         //save as a RE list
         genS = Arrays.asList(operator, reservedWord, separator, ID, number);
     }
+
+    public static void initRe(String filepath) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File(filepath)));
+        String input;
+        while ((input = br.readLine()) != null) {
+            String[] strings = input.split("->");
+            if (strings.length != 2) {
+                System.out.println(String.format("RE %s definition Error", input));
+                idSMap = null;
+                break;
+            }
+            idSMap.put(strings[0], strings[1]);
+        }
+        if (null == idSMap) return;
+        //infix to postfix
+        for (String key : idSMap.keySet()) {
+            idSMap.put(key, TreeGenerator.infix2PostFix(idSMap.get(key)));
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            initRe("test.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        TreeGenerator.RE2NFATree(idSMap);
+    }
+
 }

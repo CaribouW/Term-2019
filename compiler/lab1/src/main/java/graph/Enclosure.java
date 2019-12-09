@@ -24,7 +24,7 @@ public class Enclosure {
                 for (String edge : node.edgeFANodeMap.keySet()) {
                     if ("epsilon".equals(edge)
                             && null != node.getNext(edge)) {
-                        tmpSet.add(node.getNext(edge));
+                        tmpSet.addAll(node.getNext(edge));
                     }
                 }
             }
@@ -32,7 +32,9 @@ public class Enclosure {
             finish = true;
             for (FANode node : enclosure) {
                 if (node.edgeFANodeMap.containsKey(epsilon) &&
-                        !enclosure.contains(node.getNext(epsilon))) {
+                        !isContain(enclosure, new HashSet<>(
+                                node.getNext(epsilon)
+                        ))) {
                     finish = false;
                     break;
                 }
@@ -49,7 +51,7 @@ public class Enclosure {
         Set<FANode> ans = new HashSet<>();
         for (FANode node : enclosure) {
             if (node.edgeFANodeMap.containsKey(edge)) {
-                ans.add(node.getNext(edge));
+                ans.addAll(node.getNext(edge));
             }
         }
         return ans;
@@ -79,5 +81,14 @@ public class Enclosure {
             if (node.isEnd) return node;
         }
         return null;
+    }
+
+    public static boolean isContain(Set<FANode> enclosure, Set<FANode> set) {
+        for (FANode node : set) {
+            if (!enclosure.contains(node)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

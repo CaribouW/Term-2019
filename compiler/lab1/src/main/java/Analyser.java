@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 public class Analyser {
     //reserved syntax map
-    private static final String syntaxErr = "Syntax error!";
+    private static final String syntaxErr = "Syntax error";
 
     private static boolean isReservedSyntax(String target) {
         return new HashSet<>(Arrays.asList(REs.reservedSet)).contains(target);
@@ -20,13 +20,6 @@ public class Analyser {
         return new HashSet<>(Arrays.asList(REs.separatorSet)).contains(target);
     }
 
-    //DFA states
-    private enum STATES {
-        I0, I1, I2, I3, I4
-    }
-
-    //point out the current state
-    private static STATES curState = STATES.I0;
 
     private static String analyseCh(char ch) {
         if (Character.isDigit(ch))
@@ -47,19 +40,25 @@ public class Analyser {
         while (index < len) {
             char ch = input.charAt(index);
             if (endNode != null && ch == ' ') {
-                System.out.println(
-                        "<" + endNode.identifier + "," + sb.toString() + ">"
-                );
+                printOut(endNode.identifier, sb.toString());
                 sb = new StringBuilder();
                 ++index;
                 continue;
             }
             sb.append(ch);
+            //jump to the next state according to the transition table
             Enclosure state = Transformer.trasitionTable
                     .get(entry)
                     .getOrDefault(analyseCh(ch), null);
             if (null == state) {
-                //TODO:error
+                //Error condition due to the empty element in the transition table
+                System.out.println(syntaxErr + " on the content < " + sb.append(" >").toString());
+                sb = new StringBuilder();
+                //jump to next blank
+                while (index < input.length() &&
+                        input.charAt(index++) != ' ') {
+                }
+                continue;
             } else {
                 entry = state.identifier;
                 FANode node = state.fetchEnd();
@@ -71,12 +70,22 @@ public class Analyser {
             ++index;
         }
         if (null != endNode) {
-            System.out.println(
-                    "<" + endNode.identifier + "," + sb.toString() + ">"
-            );
+            printOut(endNode.identifier, sb.toString());
         }
     }
 
-
-
+    private static void printOut(String identifier, String content) {
+        if (isReservedSyntax(content)) {
+            System.out.println(
+                    "<" + Transformer.RE_TYPE.reservedWord.getValue() + "," + content + ">"
+            );
+        } else if (isOperator(content)) {
+            System.out.println(
+                    "<" + Transformer.RE_TYPE.operator.getValue() + "," + content + ">"
+            );
+        } else
+            System.out.println(
+                    "<" + identifier + "," + content + ">"
+            );
+    }
 }

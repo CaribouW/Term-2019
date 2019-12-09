@@ -1,6 +1,3 @@
 var x = 1
-
-function(){
-    console('hello world!')
-}
+2a inta
 

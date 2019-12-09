@@ -22,9 +22,7 @@ public class Transformer {
         }
     }
 
-    private static final String[] REs = {RE_TYPE.letter.value, RE_TYPE.digit.value,
-            RE_TYPE.separator.value, RE_TYPE.reservedWord.value,
-            RE_TYPE.operator.value};
+    private static List<String> REs = new LinkedList<>();
 
     //Graph for the FA
     public static FANode root;
@@ -52,6 +50,11 @@ public class Transformer {
         n1.insertNext(RE_TYPE.letter.value, n2);
         S.insertNext(RE_TYPE.epsilon.value, n1);
         root = S;
+    }
+
+    public static void RE2NFA(FANode node, Set<String> idSMap) {
+        root = node;
+        REs.addAll(idSMap);
     }
 
     public static void NFA2DFA() {

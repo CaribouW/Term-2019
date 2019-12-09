@@ -1,4 +1,4 @@
-package graph;
+import graph.FANode;
 
 import java.util.*;
 
@@ -21,11 +21,11 @@ public class TreeGenerator {
         outPriority.put(')', -1);
     }
 
-    public static FANode RE2NFATree(Map<String, String> REs) {
+    public static FANode RE2NFATree(Map<String, String> map) {
         List<FANode> nodes = new LinkedList<>();
         FANode root = new FANode(String.valueOf(NodeCounter++), false);
-        for (String identifier : REs.keySet()) {
-            String input = REs.get(identifier);
+        for (String identifier : map.keySet()) {
+            String input = map.get(identifier);
             String postFix = infix2PostFix(input);
             Stack<FANode> stack = new Stack<>();
             int index = 0;
@@ -34,6 +34,7 @@ public class TreeGenerator {
                 //simple node
                 if (!operators.contains(ch)) {
                     FANode f = singleNode(String.valueOf(ch));
+                    REs.edgeSet.add(String.valueOf(ch));
                     stack.push(f);
                 } else {
                     FANode f2 = null, f1 = null;

@@ -1,3 +1,5 @@
+import graph.FANode;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,7 +15,14 @@ public class Entry {
     }
 
     public static void main(String[] args) {
-        Transformer.RE2NFA(REs.genS);
+        try {
+            REs.initRe("test.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        FANode node = TreeGenerator.RE2NFATree(REs.idSMap);
+        //transform
+        Transformer.RE2NFA(node, REs.edgeSet);
         Transformer.NFA2DFA();
         Transformer.DFAOptimize();
         try {

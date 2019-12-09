@@ -21,16 +21,6 @@ public class Analyser {
     }
 
 
-    private static String analyseCh(char ch) {
-        if (Character.isDigit(ch))
-            return Transformer.RE_TYPE.digit.getValue();
-        else if (Character.isLetter(ch))
-            return Transformer.RE_TYPE.letter.getValue();
-        else if (isDelimiter(ch))
-            return Transformer.RE_TYPE.separator.getValue();
-        return "";
-    }
-
     public static void analyseEntry(String input) {
         int index = 0;
         int len = input.length();
@@ -49,7 +39,7 @@ public class Analyser {
             //jump to the next state according to the transition table
             Enclosure state = Transformer.trasitionTable
                     .get(entry)
-                    .getOrDefault(analyseCh(ch), null);
+                    .getOrDefault(String.valueOf(ch), null);
             if (null == state) {
                 //Error condition due to the empty element in the transition table
                 System.out.println(syntaxErr + " on the content < " + sb.append(" >").toString());
@@ -83,7 +73,7 @@ public class Analyser {
             System.out.println(
                     "<" + Transformer.RE_TYPE.operator.getValue() + "," + content + ">"
             );
-        } else
+        } else if (!content.isEmpty())
             System.out.println(
                     "<" + identifier + "," + content + ">"
             );

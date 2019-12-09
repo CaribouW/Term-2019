@@ -1,3 +1,4 @@
-var x = 1
-2a inta
-
+ab
+aabb
+a
+aaaaabbb

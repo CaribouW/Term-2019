@@ -1,13 +1,8 @@
-import graph.TreeGenerator;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class REs {
     private static final String orSep = "|";
@@ -45,10 +40,10 @@ public class REs {
     public static List<String> genS;
 
     public static Map<String, String> idSMap = new HashMap<>();
-
+    public static Set<String> edgeSet = new HashSet<>();
     //construct the REs from the given details
     //TODO: RE to NFA
-    // a | b ,
+    // a | b
     static {
         //basic digit and character
         for (int i = 0; i < 9; ++i) {
@@ -98,18 +93,7 @@ public class REs {
         }
         if (null == idSMap) return;
         //infix to postfix
-        for (String key : idSMap.keySet()) {
-            idSMap.put(key, TreeGenerator.infix2PostFix(idSMap.get(key)));
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            initRe("test.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        TreeGenerator.RE2NFATree(idSMap);
+        idSMap.replaceAll((k, v) -> TreeGenerator.infix2PostFix(idSMap.get(k)));
     }
 
 }

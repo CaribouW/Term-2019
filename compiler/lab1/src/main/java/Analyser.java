@@ -33,6 +33,7 @@ public class Analyser {
                 printOut(endNode.identifier, sb.toString());
                 sb = new StringBuilder();
                 ++index;
+                entry = 0;
                 continue;
             }
             sb.append(ch);
@@ -45,6 +46,7 @@ public class Analyser {
                 System.out.println(syntaxErr + " on the content < " + sb.append(" >").toString());
                 sb = new StringBuilder();
                 //jump to next blank
+                entry = 0;
                 while (index < input.length() &&
                         input.charAt(index++) != ' ') {
                 }
@@ -61,6 +63,7 @@ public class Analyser {
         }
         if (null != endNode) {
             printOut(endNode.identifier, sb.toString());
+            entry = 0;
         }
     }
 

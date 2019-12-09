@@ -16,7 +16,7 @@ public class Entry {
 
     public static void main(String[] args) {
         try {
-            REs.initRe("test.txt");
+            REs.initRe("REs.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -27,7 +27,7 @@ public class Entry {
         Transformer.DFAOptimize();
         //Conduct reading and analyse the syntax
         try {
-            read("README.md");
+            read("input.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }

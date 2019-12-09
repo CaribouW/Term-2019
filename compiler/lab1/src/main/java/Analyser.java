@@ -38,7 +38,7 @@ public class Analyser {
             }
             sb.append(ch);
             //jump to the next state according to the transition table
-            Enclosure state = Transformer.trasitionTable
+            Enclosure state = Transformer.transitionTable
                     .get(entry)
                     .getOrDefault(String.valueOf(ch), null);
             if (null == state) {

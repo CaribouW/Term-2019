@@ -28,7 +28,7 @@ public class Transformer {
     public static FANode root;
     //Transition table
     //Map from <enclosure_identifier>
-    public static List<Map<String, Enclosure>> trasitionTable = new LinkedList<>();
+    public static List<Map<String, Enclosure>> transitionTable = new LinkedList<>();
     public static List<Enclosure> enclosures = new LinkedList<>();
     public static Set<Set<Enclosure>> optimizedEnclosures = new HashSet<>();
 
@@ -84,19 +84,26 @@ public class Transformer {
                 map.put(re, tmp);
             }
             ++index;
-            trasitionTable.add(map);
+            transitionTable.add(map);
         }
     }
 
     //TODO: optimize the DFA by DFS
     public static void DFAOptimize() {
+        optimizedEnclosures = new Optimizer().optimize(transitionTable, enclosures);
+        List<Map<String, Enclosure>> ans = new LinkedList<>();
+        for (Set<Enclosure> I : optimizedEnclosures) {
+            Enclosure e = I.stream()
+                    .findAny()
+                    .get();
 
+        }
     }
 
     private static boolean isEquivalent(Enclosure e1, Enclosure e2) {
         for (String re : REs) {
-            Enclosure map1 = trasitionTable.get(e1.identifier).get(re);
-            Enclosure map2 = trasitionTable.get(e2.identifier).get(re);
+            Enclosure map1 = transitionTable.get(e1.identifier).get(re);
+            Enclosure map2 = transitionTable.get(e2.identifier).get(re);
             for (Set<Enclosure> set : optimizedEnclosures) {
                 if (set.contains(map1) && !set.contains(map2)) return false;
             }

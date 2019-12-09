@@ -24,7 +24,7 @@ public class Entry {
         //transform the RE to the final optimized DFA
         Transformer.RE2NFA(node, REs.edgeSet);
         Transformer.NFA2DFA();
-        Transformer.DFAOptimize();
+//        Transformer.DFAOptimize();
         //Conduct reading and analyse the syntax
         try {
             read("input.txt");

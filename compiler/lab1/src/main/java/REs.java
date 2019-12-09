@@ -15,7 +15,7 @@ public class REs {
             "if", "else", "default", "import", "in", "static",
             "this", "try", "throw", "final", "finally", "do",
             "delete", "let", "var", "typeof", "void", "volatile",
-            "while", "with", "yield"
+            "while", "with", "yield","return"
     };
 
 
@@ -89,8 +89,41 @@ public class REs {
                 idSMap = null;
                 break;
             }
-            idSMap.put(strings[0], strings[1]);
+
+            idSMap.put(strings[0], RETransform(strings[1]));
         }
+    }
+
+    private static String RETransform(String rawRE) {
+        StringBuilder sb = new StringBuilder();
+        int index = 0;
+        while (index < rawRE.length()) {
+            char ch = rawRE.charAt(index);
+            if (ch != '[') sb.append(ch);
+            else {
+                ++index;
+                StringBuilder substractRe = new StringBuilder();
+                while (index < rawRE.length() && rawRE.charAt(index) != ']')
+                    substractRe.append(rawRE.charAt(index++));
+                //
+                StringBuilder template = new StringBuilder();
+                String[] sub = substractRe.toString().split("-");
+                int i = 0;
+                while (i < sub.length) {
+                    char begin = sub[i].charAt(0), end = sub[i + 1].charAt(0);
+                    for (char target = begin; target < end; ++target) template.append(target).append('|');
+                    template.append(end);
+                    i += 2;
+                }
+                sb.append(template);
+            }
+            ++index;
+        }
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        REs.RETransform("([a-z]|[A-Z]).([0-9]|[a-z]|[A-Z])*");
     }
 
 }

@@ -4,7 +4,7 @@ import graph.FANode;
 import java.util.*;
 
 public class Transformer {
-    private enum RE_TYPE {
+    public enum RE_TYPE {
         letter("letter"),
         digit("digit"),
         separator("separator"),
@@ -39,10 +39,11 @@ public class Transformer {
         FANode S = new FANode("S", false);
         //n3 n4
         FANode n3 = new FANode("3", false);
-        FANode n4 = new FANode("4", true);
+        //Set to ID
+        FANode n4 = new FANode("ID", true);
         n3.insertNext(RE_TYPE.epsilon.value, n4);
         n3.insertNext(RE_TYPE.digit.value, n3);
-        n3.insertNext(RE_TYPE.digit.value, n3);
+        n3.insertNext(RE_TYPE.letter.value, n3);
         //n2
         FANode n2 = new FANode("2", false);
         n2.insertNext(RE_TYPE.epsilon.value, n3);
@@ -65,28 +66,38 @@ public class Transformer {
                 //get the enclosure
                 Enclosure tmp = new Enclosure(set);
                 if (tmp.isEmpty()) continue;
-                if (!tmp.equals(enclosure)) {
+                if (!enclosures.contains(tmp)) {
                     //add new Enclosure I
                     tmp.identifier = enclosures.size();
                     enclosures.add(tmp);
+                } else {
+                    for (Enclosure en : enclosures) {
+                        if (en.equals(tmp)) {
+                            tmp = en;
+                            break;
+                        }
+                    }
                 }
                 map.put(re, tmp);
             }
             ++index;
             trasitionTable.add(map);
         }
-        printTable();
     }
 
     //TODO: optimize the DFA by DFS
     public static void DFAOptimize() {
-        optimizedEnclosures.add((Set<Enclosure>) enclosures);
 
     }
 
-    private static void printTable() {
-        for (int i = 0; i < enclosures.size(); ++i) {
-
+    private static boolean isEquivalent(Enclosure e1, Enclosure e2) {
+        for (String re : REs) {
+            Enclosure map1 = trasitionTable.get(e1.identifier).get(re);
+            Enclosure map2 = trasitionTable.get(e2.identifier).get(re);
+            for (Set<Enclosure> set : optimizedEnclosures) {
+                if (set.contains(map1) && !set.contains(map2)) return false;
+            }
         }
+        return true;
     }
 }

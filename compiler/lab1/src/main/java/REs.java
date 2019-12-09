@@ -6,7 +6,7 @@ public class REs {
     private static final String loopSep = "*";
     //reserved syntax map
     private static final String syntaxErr = "Syntax error!";
-    private static final String[] reservedSet = {
+    public static final String[] reservedSet = {
             "function", "abstract", "arguments", "boolean",
             "break", "const", "byte", "boolean", "catch",
             "if", "else", "default", "import", "in", "static",
@@ -17,13 +17,13 @@ public class REs {
 
 
     //operator appear in the js
-    private static final String[] operatorSet = {
+    public static final String[] operatorSet = {
             "+", "-", "/", "%", ">", "<",
             "=", "&", "|", "~", ">=", "<=", "==",
             "!=", "===", "!==", "&&", "||", "++", "--", "+=",
             "-=", "(", ")", "[", "]", ".", "\""};
 
-    private static final char[] separatorSet = {',', ';', '{', '}'};
+    public static final char[] separatorSet = {',', ';', '{', '}'};
     //All of the valid REs defined by myself
     public static String digit = "";
     public static String character = "";

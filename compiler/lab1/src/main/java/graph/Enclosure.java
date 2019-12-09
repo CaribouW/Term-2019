@@ -68,4 +68,16 @@ public class Enclosure {
     public boolean isEmpty() {
         return this.enclosure.size() == 0;
     }
+
+    /**
+     * To get whether the enclosure is the end
+     *
+     * @return : return the end node if it exists , otherwise return NULL.
+     */
+    public FANode fetchEnd() {
+        for (FANode node : enclosure) {
+            if (node.isEnd) return node;
+        }
+        return null;
+    }
 }

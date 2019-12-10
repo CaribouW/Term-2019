@@ -6,12 +6,15 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "axios": "latest",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
-    "axios": "latest"
+    "mysql": "^2.17.1",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.21"
   }
 }

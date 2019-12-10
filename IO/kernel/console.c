@@ -215,7 +215,7 @@ PRIVATE void fill_symbol(u8 *pos, const u8 ch, const u8 color)
 	pos[0] = ch;
 	pos[1] = color;
 }
-//
+//0
 PRIVATE void normal_out_char(CONSOLE *p_con, char ch)
 {
 	u8 *p_vmem = (u8 *)(V_MEM_BASE + p_con->cursor * 2); //cur
@@ -397,7 +397,8 @@ PRIVATE void put_ch(CONSOLE *p_con, const char ch)
 		if (p_con->cursor + 4 < p_con->original_addr +
 									p_con->v_mem_limit)
 		{
-			int begin = p_con->original_addr + ((p_con->cursor - p_con->original_addr) / SCREEN_WIDTH) * SCREEN_WIDTH;
+			int begin = p_con->original_addr + 
+			((p_con->cursor - p_con->original_addr) / SCREEN_WIDTH) * SCREEN_WIDTH;
 			int count = 4 - (p_con->cursor - begin) % 4;
 			for (int i = 0; i < count; i++)
 			{

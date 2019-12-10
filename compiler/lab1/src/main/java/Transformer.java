@@ -85,8 +85,7 @@ public class Transformer {
             }
             ++index;
             transitionTable.add(map);
-        }
-    }
+        } }
 
     //TODO: optimize the DFA by DFS
     public static void DFAOptimize() {

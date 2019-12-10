@@ -8,7 +8,7 @@
 
 #### 0.1 源文件目录截图
 
-<img src="https://i.loli.net/2019/12/09/rneRGU3gd5WIkJ9.png" style="zoom: 50%;" />
+![image-20191209224921842](/Users/mac/Library/Application Support/typora-user-images/image-20191209224921842.png)
 
 说明：
 
@@ -18,20 +18,21 @@
 - `Transformer` 主要负责核心部分的 $RE=>NFA$ , $NFA=>DFA$ , $NFA$ 优化。具体算法逻辑请见下文
 - `TreeGenerator` 辅助 `Transformer` 模块，负责最终 `Enclosure` & `FANode` 的图构建 (*Thompson* 算法)，图的 `DFS , BFS` 遍历算法实现
 - `Analyser` 是在 `transfomer` 获取得到优化 $DFA$ 之后，根据 $DFA$ 来进行我们最终的词法分析，也是我们的词法分析器的执行模块。它将会读取指定的 `input.txt` 文本文件，基于之前给定的正则 $REs$ , 来进行词法分析，输出最终的 `tokens`
+- `optimizer` 进行 *DFA* 优化的工作
 
 #### 0.2 输入文件格式截图
 
 > $REs.txt$ 文件内容 
 
-<img src="https://i.loli.net/2019/12/09/Xkntgdq3wozyxDh.png" style="zoom:50%;" />
+<img src="/Users/mac/Library/Application Support/typora-user-images/image-20191209224952870.png" alt="image-20191209224952870"  />
 
 > 输入文件内容
 
-![](https://i.loli.net/2019/12/09/8DJidtCmnHj2vSW.png)
+![image-20191209225014864](/Users/mac/Library/Application Support/typora-user-images/image-20191209225014864.png)
 
 > 输出 *token* 内容
 
-![](https://i.loli.net/2019/12/09/tDZpIU9CXPmnY6v.png)
+![image-20191209225044460](/Users/mac/Library/Application Support/typora-user-images/image-20191209225044460.png)
 
 ### 1. 词法分析步骤简介
 
@@ -182,6 +183,25 @@ class Enclosure{
 }
 ```
 
-### 5. 实验评价和感觉
+#### 4.2 运行速度问题
+
+当我的 *REs* 如下定义的时候
+
+```
+letter->([a-z]|[A-Z]|_).([0-9]|[a-z]|[A-Z])*
+number->([0-9])*
+operator->+|-|/|%|<|=|>|&
+separator->,|;|{|}
+```
+
+其运行速度可以说是特别地慢，解析简短的10行代码也要接近十秒。
+
+我特别地去查看了一下中间转换的过程中的节点个数，下图是在 *NFA=>DFA* 之后的运行结果图：
+
+![image-20191209225316356](/Users/mac/Library/Application Support/typora-user-images/image-20191209225316356.png)
+
+可以看到，转换表 `tansitionTable` 的条目达到了 **138** 条之多，那么 *NFA* 的数量就想必更加庞大，而我在填表的后期，使用的是 **DFS** 算法，其运行速度慢也就不足为奇。至于其优化方案，初步设想就是是否能够利用 《龙书》上的 $RE=>DFA$ 直接进行计算，减少前期因为深度遍历造成的浪费。
+
+### 5. 实验评价和感觉 
 
 此次实验的重点在于对原来的算法的理解的基础上，进行建模工作。而其中一些常用的栈操作、DFS、BFS算法也是一个很好的巩固机会，能够进一步加深对于课程内容的理解。而且在此基础上，Lab2中的YACC也能够借鉴我这一次的数据结构内容，从而也算是突破了不少的难关。

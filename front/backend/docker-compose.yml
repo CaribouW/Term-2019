@@ -8,12 +8,31 @@ services:
       dockerfile: Dockerfile
     networks:
       - proxy
+      - front
     environment:
       - VIRTUAL_HOST=106.14.140.93
-      - VIRTUAL_PORT=3000
+      - VIRTUAL_PORT=8000
       - LETSENCRYPT_HOST=106.14.140.93
       - LETSENCRYPT_EMAIL=1071956678@qq.com
+
+  front-mysql:
+    image: 'mysql:5.7.21'
+    container_name: front-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_DATABASE=front
+    volumes: # 设置映射目录
+      - ./mysqldb/data:/data/db
+      - ./mysqldb/backup:/data/backup
+    ports:
+      - '3306:3306'
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    networks:
+      - front
 
 networks:
   proxy:
     external: true
+  front:
+    driver: bridge

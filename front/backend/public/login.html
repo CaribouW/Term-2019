@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -144,4 +145,15 @@
 
     }
 </style>
+<script>
+    axios({
+        url: '/',
+        baseURL: 'http://localhost:8000',
+        params: {
+            'name': 't'
+        }
+    }).then(res => {
+        console.log(res)
+    })
+</script>
 </html>

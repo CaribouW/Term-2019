@@ -4,69 +4,81 @@
     <meta charset="utf-8">
     <title>login</title>
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/toastr.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
-    </script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js"></script>
+    <script src="js/toastr.min.js"></script>
 </head>
 
 <body>
 <div class="dowebok">
-    <div class="form sign-in">
-        <h2>欢迎回来</h2>
+    <form class="form sign-in">
+        <h2>Welcome back</h2>
         <label>
-            <span>邮箱</span>
-            <input type="email" class="login-email"/>
+            <span>email</span>
+            <input type="email" class="login-email email"/>
         </label>
         <label>
-            <span>密码</span>
-            <input type="password" class="login-password"/>
+            <span>password</span>
+            <input type="password" class="login-password password"/>
         </label>
-        <p class="forgot-pass"><a href="javascript:">忘记密码？</a></p>
-        <button type="button" class="submit" onclick="login();">登 录</button>
-        <button type="button" class="fb-btn">使用 <span>github</span> 帐号登录</button>
-    </div>
-    <div class="sub-cont">
+        <p class="forgot-pass"><a href="javascript:">Forget password？</a></p>
+        <button type="button" class="submit" onclick="login();">login</button>
+        <button type="button" class="fb-btn"><a
+                href="https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/">login with <span>github</span></a>
+        </button>
+    </form>
+    <form class="sub-cont">
         <div class="img">
             <div class="img__text m--up">
-                <h2>还未注册？</h2>
-                <p>立即注册，发现大量机会！</p>
+                <h2>Not a member?</h2>
+                <p>Join Us Now！</p>
             </div>
             <div class="img__text m--in">
-                <h2>已有帐号？</h2>
-                <p>有帐号就登录吧，好久不见了！</p>
+                <h2>Is a member？</h2>
+                <p>Go to login!</p>
             </div>
             <div class="img__btn">
-                <span class="m--up">注 册</span>
-                <span class="m--in">登 录</span>
+                <span class="m--up">Register</span>
+                <span class="m--in">Login</span>
             </div>
         </div>
         <div class="form sign-up">
-            <h2>立即注册</h2>
+            <h2>register</h2>
             <label>
-                <span>邮箱</span>
-                <input type="email" class="reg-email"/>
+                <span>email</span>
+                <input type="email" name="email" class="reg-email email"/>
             </label>
             <label>
-                <span>密码</span>
-                <input type="password" class="reg-password"/>
+                <span>password</span>
+                <input type="password" class="reg-password password"/>
             </label>
             <label>
-                <span>再次输入密码</span>
+                <span>input password again</span>
                 <input type="password" class="reg-password-checker"/>
             </label>
-            <button type="button" class="submit" onclick="register()">注 册</button>
-            <button type="button" class="fb-btn">使用 <span>github</span> 帐号注册</button>
+            <button type="button" class="submit" onclick="register()">register</button>
+            <button type="button" class="fb-btn"><a
+                    href="https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/">use account on
+                <span>github</span></a></button>
         </div>
-    </div>
+    </form>
 </div>
-
+<script src="js/validation.js"></script>
 <script>
+    toastr.options.positionClass = 'toast-top-center';
     document.querySelector('.img__btn').addEventListener('click', function () {
         document.querySelector('.dowebok').classList.toggle('s--signup')
     });
+    const baseURL = 'http://localhost:8000/api';
+    axios.defaults.headers.post['Content-Type'] = 'json';
+    //validation
+    toastr.info('Welcome to the Uncover!');
 
+    //Server part
     const login = () => {
-        axios.defaults.headers.post['Content-Type'] = 'json';
         const username = $('.login-email').val();
         const password = $('.login-password').val();
         const data = {"username": username, "password": password};
@@ -74,48 +86,48 @@
             url: '/users/login',
             method: 'POST',
             data: data,
-            baseURL: 'http://localhost:8000/api',
+            baseURL: baseURL,
         }).then(res => {
-            if (200 === res.status) {
-                $('.email').innerText = $('.password').innerText = '';
-                alert('login successfully');
-                location.href = 'home.html';
-            } else {
-
-            }
+            $('.email').innerText = $('.password').innerText = '';
+            // alert('login successfully');
+            toastr.success('login successfully');
+            location.href = 'home.html';
+        }).catch(e => {
+            toastr.error('password incorrect!');
         })
     };
 
     const register = () => {
-        axios.defaults.headers.post['Content-Type'] = 'json';
         const username = $('.reg-email').val();
         const password = $('.reg-password').val();
         const checker = $('.reg-password-checker').val();
         const data = {"username": username, "password": password};
         if (password !== checker) {
-            alert('Password not match!');
+            toastr.warning('Password not match!');
+
             $('.email').val('');
             $('.password').val('');
             $('.password-checker').val('');
-            return;
-        }
-        axios({
-            url: '/users/',
-            method: 'POST',
-            data: data,
-            baseURL: 'http://localhost:8000/api',
-        }).then(res => {
-            if (200 === res.status) {
+        } else {
+            axios({
+                url: '/users/',
+                method: 'POST',
+                data: data,
+                baseURL: baseURL,
+            }).then(res => {
                 $('.email').val('');
                 $('.password').val('');
                 $('.reg-password-checker').val('');
-                alert('register successfully');
+                // alert('register successfully');
+                toastr.success('register successfully');
                 location.href = 'home.html';
-            } else {
+            }).catch(e => {
+                toastr.error('account already exist!');
+            })
+        }
+    };
 
-            }
-        })
-    }
+
 </script>
 </body>
 

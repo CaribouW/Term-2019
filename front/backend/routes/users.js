@@ -26,10 +26,10 @@ router.post('/login', (req, res) => {
     console.log(req.body);
     if (req.body.username === user.username &&
         req.body.password === user.password) {
-        res.sendStatus(200).end();
+        res.status(200).end();
     } else {
         //not match
-        res.sendStatus(401).end();
+        res.status(401).end();
     }
 });
 

@@ -25,8 +25,6 @@ services:
     volumes: # 设置映射目录
       - ./mysqldb/data:/data/db
       - ./mysqldb/backup:/data/backup
-    ports:
-      - '3306:3306'
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     networks:
       - front

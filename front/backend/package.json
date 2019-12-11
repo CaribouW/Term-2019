@@ -14,7 +14,15 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "mysql": "^2.17.1",
+    "mysql2": "^2.0.2",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.21"
+    "sequelize": "^5.21.2",
+    "typeorm": "^0.2.21",
+    "uuid": "^3.3.3",
+    "body-parser": "latest"
+  },
+  "devDependencies": {
+    "express-session": "^1.17.0",
+    "node-uuid": "^1.4.8"
   }
 }

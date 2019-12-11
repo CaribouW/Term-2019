@@ -4,7 +4,7 @@ module.exports =
             host: 'localhost',
             user: 'root',
             password: 'mysql',
-            database: 'front',
+            dbName: 'front',
             port: 3306
         }
     };

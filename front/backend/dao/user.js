@@ -1,39 +1,40 @@
-var user = {
-    insert: 'insert into user(id, name, age) values(0,?,?);',
-    update: 'update user set name=?, age=? where id=?;',
-    delete: 'delete from user where id=?;',
-    queryById: 'select * from user where id=?;',
-    queryAll: 'select * from user;'
+const User = require('../model/user');
+const crypto = require('crypto');
+
+const insertUser = (user) => {
+    //create the user model
+    return User.create({
+        uid: user.uid,
+        username: user.username,
+        password: user.password
+    }).then(res => {
+        return JSON.parse(JSON.stringify(res))
+    });
 };
 
-// dao/userDao.js
-// 实现与MySQL交互
-var mysql = require('mysql');
-var $conf = require('../db/config');
-
-// 使用连接池，提升性能
-//var pool  = mysql.createPool($util.extend({}, $conf.mysql));
-const pool = mysql.createPool($conf.mysql);
-
-const jsonWrite = function (res, ret) {
-    if (typeof ret === 'undefined') {
-        res.json({
-            code: '1',
-            msg: '操作失败'
-        });
-    } else {
-        res.json(ret);
-    }
+const updateUser = (user) => {
+    return User.update({
+        id: user.id,
+        uid: user.uid,
+        username: user.username,
+        password: user.password
+    })
 };
 
-module.exports = {
-    queryAll: function (req, res, next) {
-        pool.getConnection(function (err, connection) {
-            connection.query(user.queryAll, function (err, result) {
-                jsonWrite(res, result);
-                connection.release();
-            });
-        });
-    }
-
+const findUserByName = (name) => {
+    return User.findAll({
+        where: {
+            username: name,
+        }
+    }).then(res => {
+        return JSON.parse(JSON.stringify(res));
+    });
 };
+
+const findAll = () => {
+    return User.findAll().then(ans => {
+        return JSON.parse(JSON.stringify(ans));
+    });
+};
+
+module.exports = {insertUser, updateUser, findAll,findUserByName};

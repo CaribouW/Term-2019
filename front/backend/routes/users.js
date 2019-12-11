@@ -37,7 +37,7 @@ router.post('/', (req, res) => {
 
 //预先的密码加密
 //用户登录接口
-router.use('/login', (req, res, next) => {
+router.post('/login', (req, res, next) => {
     user.findUserByName(req.body.username).then(ans => {
         if (ans.length !== 1) {
             res.sendStatus(404).end();

@@ -9,7 +9,6 @@ COPY . /home/Service
 
 #使用RUN命令执行npm install安装工程依赖库
 RUN npm install --registry=https://registry.npm.taobao.org
-
 #暴露给主机的端口号
 EXPOSE 3000
 #执行npm start命令，启动Node工程

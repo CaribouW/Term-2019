@@ -13,7 +13,7 @@ router.get('/', function getCaptcha(req, res, next) {
         // 字体大小
         fontSize: 36,
         // 噪声线条数
-        noise: 2,
+        noise: 1,
         // 宽度
         width: 80,
         // 高度

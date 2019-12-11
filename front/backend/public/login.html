@@ -30,6 +30,17 @@
             <a href="javascript:">Forget password？
             </a>
         </p>
+        <label>
+            <span>input captcha</span>
+            <div style="display: flex;flex-direction: row">
+                <input type="text"
+                       name="captcha"
+                />
+                <div style="border: #909399 2px solid">
+                    <img src="/captcha" alt="captcha">
+                </div>
+            </div>
+        </label>
         <button type="submit" class="submit">login
         </button>
         <button type="button" class="fb-btn"><a
@@ -75,6 +86,7 @@
         </div>
     </form>
 </div>
+</body>
 <script src="js/validation.js"></script>
 <script>
     toastr.options.positionClass = 'toast-top-center';
@@ -86,7 +98,6 @@
     //validation
     toastr.info('Welcome to the Uncover!');
 </script>
-</body>
 <style>
     em.success {
         font-size: 19px;

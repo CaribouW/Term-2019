@@ -31,13 +31,17 @@
             </a>
         </p>
         <label>
-            <div class="captcha">
+            <a class="captcha" title="click to flush captcha"
+            >
                 <input type="text" name="captcha" placeholder="input captcha" id="captcha"/>
                 <div class="captcha-blank"></div>
-                <div class="captcha-img" style="border: #909399 2px solid">
-                    <img src="/captcha" alt="captcha">
+                <div class="captcha-img"
+                     style="border: #909399 2px solid"
+                     onclick="flushCaptcha()"
+                >
+                    <img id="captcha-img" src="/captcha" alt="captcha">
                 </div>
-            </div>
+            </a>
         </label>
         <button type="submit" class="submit">login
         </button>
@@ -97,6 +101,10 @@
     axios.defaults.headers.post['Content-Type'] = 'json';
     //validation
     toastr.info('Welcome to the Uncover!');
+
+    const flushCaptcha = () => {
+        $('#captcha-img').attr('src', '/captcha?num=' + Math.random());
+    };
 </script>
 <style>
     em.success {

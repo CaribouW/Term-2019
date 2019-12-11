@@ -294,3 +294,7 @@ input {
 .captcha > .captcha-img {
     flex: 0 0 20%;
 }
+
+.captcha > .captcha-img:hover {
+    cursor: pointer;
+}

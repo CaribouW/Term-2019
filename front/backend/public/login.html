@@ -8,29 +8,35 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdn.bootcss.com/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
     <script src="js/toastr.min.js"></script>
 </head>
-
 <body>
 <div class="dowebok">
-    <form class="form sign-in">
+    <form class="form sign-in" id="login-form">
         <h2>Welcome back</h2>
         <label>
             <span>email</span>
-            <input type="email" class="login-email email"/>
+            <input type="email"
+                   class="login-email email"
+                   name="email"/>
         </label>
         <label>
             <span>password</span>
-            <input type="password" class="login-password password"/>
+            <input type="password" name="password"
+                   class="login-password password"/>
         </label>
-        <p class="forgot-pass"><a href="javascript:">Forget password？</a></p>
-        <button type="button" class="submit" onclick="login();">login</button>
+        <p class="forgot-pass">
+            <a href="javascript:">Forget password？
+            </a>
+        </p>
+        <button type="submit" class="submit">login
+        </button>
         <button type="button" class="fb-btn"><a
                 href="https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/">login with <span>github</span></a>
         </button>
     </form>
-    <form class="sub-cont">
+    <form class="sub-cont" id="reg-form">
         <div class="img">
             <div class="img__text m--up">
                 <h2>Not a member?</h2>
@@ -49,17 +55,20 @@
             <h2>register</h2>
             <label>
                 <span>email</span>
-                <input type="email" name="email" class="reg-email email"/>
+                <input type="email" name="email"
+                       class="reg-email email"/>
             </label>
             <label>
                 <span>password</span>
-                <input type="password" class="reg-password password"/>
+                <input type="password" name="password" id="reg-psw"
+                       class="reg-password password"/>
             </label>
             <label>
                 <span>input password again</span>
-                <input type="password" class="reg-password-checker"/>
+                <input type="password" name="checker"
+                       class="reg-password-checker"/>
             </label>
-            <button type="button" class="submit" onclick="register()">register</button>
+            <button type="submit" class="submit">register</button>
             <button type="button" class="fb-btn"><a
                     href="https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/">use account on
                 <span>github</span></a></button>
@@ -77,58 +86,20 @@
     //validation
     toastr.info('Welcome to the Uncover!');
 
-    //Server part
-    const login = () => {
-        const username = $('.login-email').val();
-        const password = $('.login-password').val();
-        const data = {"username": username, "password": password};
-        axios({
-            url: '/users/login',
-            method: 'POST',
-            data: data,
-            baseURL: baseURL,
-        }).then(res => {
-            $('.email').innerText = $('.password').innerText = '';
-            // alert('login successfully');
-            toastr.success('login successfully');
-            location.href = 'home.html';
-        }).catch(e => {
-            toastr.error('password incorrect!');
-        })
-    };
-
-    const register = () => {
-        const username = $('.reg-email').val();
-        const password = $('.reg-password').val();
-        const checker = $('.reg-password-checker').val();
-        const data = {"username": username, "password": password};
-        if (password !== checker) {
-            toastr.warning('Password not match!');
-
-            $('.email').val('');
-            $('.password').val('');
-            $('.password-checker').val('');
-        } else {
-            axios({
-                url: '/users/',
-                method: 'POST',
-                data: data,
-                baseURL: baseURL,
-            }).then(res => {
-                $('.email').val('');
-                $('.password').val('');
-                $('.reg-password-checker').val('');
-                // alert('register successfully');
-                toastr.success('register successfully');
-                location.href = 'home.html';
-            }).catch(e => {
-                toastr.error('account already exist!');
-            })
-        }
-    };
 
 
 </script>
 </body>
+<style>
+    em.success {
+        font-size: 19px;
+    }
 
+    em.error {
+        position: absolute;
+        text-align: right;
+        color: #a31119;
+        font-size: 10px;
+    }
+</style>
 </html>

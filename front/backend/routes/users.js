@@ -20,7 +20,7 @@ router.post('/', (req, res) => {
 //用户登录接口
 router.post('/login', (req, res) => {
     const user = {
-        username: 'admin',
+        username: '123@qq.com',
         password: 'admin'
     };
     console.log(req.body);

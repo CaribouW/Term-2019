@@ -31,12 +31,10 @@
             </a>
         </p>
         <label>
-            <span>input captcha</span>
-            <div style="display: flex;flex-direction: row">
-                <input type="text"
-                       name="captcha"
-                />
-                <div style="border: #909399 2px solid">
+            <div class="captcha">
+                <input type="text" name="captcha" placeholder="input captcha" id="captcha"/>
+                <div class="captcha-blank"></div>
+                <div class="captcha-img" style="border: #909399 2px solid">
                     <img src="/captcha" alt="captcha">
                 </div>
             </div>
@@ -47,7 +45,7 @@
                 href="https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/">login with <span>github</span></a>
         </button>
     </form>
-    <form class="sub-cont" id="reg-form">
+    <form class="form sub-cont" id="reg-form">
         <div class="img">
             <div class="img__text m--up">
                 <h2>Not a member?</h2>
@@ -91,6 +89,8 @@
 <script>
     toastr.options.positionClass = 'toast-top-center';
     document.querySelector('.img__btn').addEventListener('click', function () {
+        document.getElementById("login-form").reset();
+        document.getElementById("reg-form").reset();
         document.querySelector('.dowebok').classList.toggle('s--signup')
     });
     const baseURL = 'http://localhost:8000/api';

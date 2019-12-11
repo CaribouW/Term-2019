@@ -3,11 +3,10 @@
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="12.0.2" project-jdk-type="JavaSDK" />
   <component name="SbtLocalSettings">
     <option name="projectSyncType">
       <map>
-        <entry key="$PROJECT_DIR$/../../CloudComputing2019/SparkAnalysis" value="PREVIEW" />
+        <entry key="$PROJECT_DIR$/../../../CloudComputing2019/SparkAnalysis" value="PREVIEW" />
       </map>
     </option>
   </component>

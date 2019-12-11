@@ -2,20 +2,25 @@
 const login = (form) => {
     const username = $('.login-email').val();
     const password = $('.login-password').val();
-    const data = {"username": username, "password": password};
+    const cat = $('#captcha').val();
+    const data = {
+        "username": username,
+        "password": password,
+        "captcha": cat
+    };
     axios({
         url: '/users/login',
         method: 'POST',
         data: data,
         baseURL: baseURL,
-    }).then(res => {
+    }).then((ans, err) => {
+        console.log(err);
         $('.email').innerText = $('.password').innerText = '';
-        // alert('login successfully');
         location.href = 'home.html';
         toastr.success('login successfully');
-    }).catch(e => {
-        toastr.error('password incorrect!');
-    })
+    }).catch(error => {
+        toastr.error(error.response.data);
+    });
 };
 
 const register = (form) => {
@@ -23,29 +28,20 @@ const register = (form) => {
     const password = $('.reg-password').val();
     const checker = $('.reg-password-checker').val();
     const data = {"username": username, "password": password};
-    if (password !== checker) {
-        toastr.warning('Password not match!');
-
-        $('.email').val('');
-        $('.password').val('');
-        $('.password-checker').val('');
-    } else {
-        axios({
-            url: '/users/',
-            method: 'POST',
-            data: data,
-            baseURL: baseURL,
-        }).then(res => {
-            $('.email').val('');
-            $('.password').val('');
-            $('.reg-password-checker').val('');
-            // alert('register successfully');
-            toastr.success('register successfully');
-            location.href = 'home.html';
-        }).catch(e => {
-            toastr.error('account already exist!');
-        })
-    }
+    axios({
+        url: '/users/',
+        method: 'POST',
+        data: data,
+        baseURL: baseURL,
+    }).then(res => {
+        document.getElementById("login-form").reset();
+        document.getElementById("reg-form").reset();
+        // alert('register successfully');
+        toastr.success('register successfully');
+        location.href = 'home.html';
+    }).catch(error => {
+        toastr.error(error.response.data);
+    })
 };
 $("#login-form").validate({
     rules: {
@@ -55,6 +51,9 @@ $("#login-form").validate({
         password: {
             required: true,
             minlength: 5
+        },
+        captcha: {
+            required: true,
         }
     },
     messages: {
@@ -65,6 +64,9 @@ $("#login-form").validate({
         email: {
             required: "Please input the email"
         },
+        captcha: {
+            required: "Please input the captcha"
+        }
     },
     errorElement: "em",
     success: function (label) {

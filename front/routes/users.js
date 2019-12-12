@@ -59,15 +59,15 @@ router.post('/login', (req, res, next) => {
             const checkPsw = decrypt(ans[0].password, ans[0].uid);
             const checkCaptcha = decrypt(cookie.captcha, 'captcha');
             if (checkCaptcha !== req.body.captcha) {
-                res.status(403).send('captcha incorrect').end();
+                res.status(403).end('captcha incorrect');
             } else if (checkPsw !== req.body.password) {
-                res.status(403).send('password incorrect').end();
+                res.status(403).end('password incorrect');
             }
             next();
         }
     });
 }, (req, res) => {
-    res.status(200).send(
+    res.status(200).end(
         'login successfully');
 });
 

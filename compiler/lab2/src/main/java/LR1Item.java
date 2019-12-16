@@ -51,8 +51,18 @@ public class LR1Item {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return rule.hashCode() + dotIndex + predictiveSymbols.stream().map(sy -> sy.hashCode()).reduce((a, b) -> a + b).get();
+    }
+
     public String getPointValue() {
         if (isDotEnd()) return null;
         return String.valueOf(this.rule.second.charAt(dotIndex));
+    }
+
+    public String restPart() {
+        if (dotIndex == rule.second.length() - 1) return "";
+        return String.valueOf(rule.second.charAt(dotIndex + 1));
     }
 }

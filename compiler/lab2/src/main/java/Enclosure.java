@@ -61,7 +61,7 @@ public class Enclosure {
                 if (!edge2RuleMap.containsKey(edgeName)) {
                     edge2RuleMap.put(edgeName, Collections.singleton(single));
                 } else {
-                    Set<LR1Item> rs = edge2RuleMap.get(edgeName);
+                    Set<LR1Item> rs = new HashSet<>(edge2RuleMap.get(edgeName));
                     rs.add(single);
                     edge2RuleMap.put(edgeName, rs);
                 }
@@ -85,8 +85,16 @@ public class Enclosure {
      * @param V_N:  非终结符
      * @param rules : 原文法内容
      */
-    private static Set<String> first(String V_N, List<Pair<String, String>> rules) {
-        return new HashSet<>();
+    public static Set<String> first(String V_N, List<Pair<String, String>> rules) {
+        Set<String> ans = new HashSet<>();
+        String first = V_N.substring(0, 1);
+        //ignore V_N
+        if (Rule.isV_N(first)) {
+            assert false;
+        } else {
+            ans.add(first);
+        }
+        return ans;
     }
 
     /**
@@ -106,26 +114,45 @@ public class Enclosure {
      * @return : epsilon 闭包
      */
     private static Set<LR1Item> encloseOf(Set<LR1Item> core) {
-        Set<LR1Item> newItems = new HashSet<>();
-        for (LR1Item item : core) {
-            if (item.isDotEnd()) continue;
-            String nextVal = item.getPointValue();
-            assert nextVal != null;
-            //是一个非终结符
-            if (Rule.isV_N(nextVal)) {
-                for (Pair<String, String> rule : Rule.rules) {
-                    if (rule.first.equals(nextVal)) {
-                        //获取first
-                        List<String> predictiveSymbols =
-                                new LinkedList<>(first("", Rule.rules));
-                        LR1Item cur = new LR1Item(rule, 0, predictiveSymbols);
-                        newItems.add(cur);
+        while (true) {
+            Set<LR1Item> newItems = new HashSet<>();
+            for (LR1Item item : core) {
+                if (item.isDotEnd()) continue;
+                String nextVal = item.getPointValue();
+                assert nextVal != null;
+                //是一个非终结符
+                if (Rule.isV_N(nextVal)) {
+                    for (Pair<String, String> rule : Rule.rules) {
+                        if (rule.first.equals(nextVal)) {
+                            //获取first
+                            for (String symbol : item.predictiveSymbols) {
+                                String V_N = item.restPart() + symbol; // first()
+                                List<String> predictiveSymbols =
+                                        new LinkedList<>(first(V_N, Rule.rules));
+                                LR1Item cur = new LR1Item(rule, 0, predictiveSymbols);
+                                if (!core.contains(cur))
+                                    newItems.add(cur);
+                            }
+                        }
                     }
                 }
             }
+            Set<LR1Item> tmp = new HashSet<>(core);
+
+            core.addAll(newItems);
+            if (isSame(core, tmp))
+                break;
         }
-        core.addAll(newItems);
         return core;
+    }
+
+
+    private static boolean isSame(Set<LR1Item> i1, Set<LR1Item> i2) {
+        if (i1.size() != i2.size()) return false;
+        for (LR1Item item : i1) {
+            if (!i2.contains(item)) return false;
+        }
+        return true;
     }
 
     @Override
@@ -139,5 +166,13 @@ public class Enclosure {
             }
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return identifier.hashCode() + this.items.stream()
+                .map(LR1Item::hashCode)
+                .reduce(Integer::sum)
+                .get();
     }
 }

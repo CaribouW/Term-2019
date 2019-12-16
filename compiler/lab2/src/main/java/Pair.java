@@ -10,7 +10,12 @@ public class Pair<K, V> {
     @Override
     public boolean equals(Object obj) {
         Pair<K, V> pair = (Pair<K, V>) obj;
-        return pair.first == first &&
-                pair.second == second;
+        return pair.first.equals(first) &&
+                pair.second.equals(second);
+    }
+
+    @Override
+    public int hashCode() {
+        return first.hashCode() + second.hashCode();
     }
 }

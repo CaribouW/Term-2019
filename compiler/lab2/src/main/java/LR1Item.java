@@ -7,7 +7,8 @@ import java.util.List;
 enum symbols {
     epsilon("epsilon"),
     zeroGen("S'"),
-    end("$");
+    end("$"),
+    accept("accept");
     private String value;
 
     symbols(String symbol) {
@@ -23,7 +24,6 @@ public class LR1Item {
     public Pair<String, String> rule;   //文法映射
     public int dotIndex;                //点的位置
     public List<String> predictiveSymbols;//预测符
-
 
     public LR1Item(Pair<String, String> rule, int dotIndex, List<String> predictiveSymbols) {
         this.rule = new Pair<>(rule.first, rule.second);

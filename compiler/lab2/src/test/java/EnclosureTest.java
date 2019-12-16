@@ -23,7 +23,8 @@ public class EnclosureTest {
         Rule.rules.add(new Pair<>("S'", "S"));//S' -> S
         enclosure = new Enclosure(Rule.rules);
         //第一个闭包
-        assertEquals(13, enclosure.items.size());
+        int size = 13;
+        assertEquals(size, enclosure.items.size());
     }
 
     //first 函数测试
@@ -40,6 +41,12 @@ public class EnclosureTest {
         Rule.rules.add(new Pair<>("S'", "S"));//S' -> S
         enclosure = new Enclosure(Rule.rules);
         Set<Enclosure> nextEnclosures = enclosure.getNext();
-        assertEquals(3, nextEnclosures.size());
+        assertEquals(1, nextEnclosures.size());
+        assertEquals(1, enclosure.outEdges.size());
+        Set<Enclosure> graph = Parser.rule2Enclosure(Rule.rules, "S");
+        assertEquals(4, graph.size());
+//        ParsingTable table = new ParsingTable(graph);
+//        assertEquals(graph.size(),table.size());
+//        table.printout();
     }
 }

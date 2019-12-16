@@ -1,10 +1,13 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Enclosure {
+    public static Set<Enclosure> enclosures = new HashSet<>();
     public static int counter = 0;
     public Set<LR1Item> items;
     public String identifier;
     public Map<String, String> outEdges = new HashMap<>();     //边名称->闭包标识符的映射
+
 
     /**
      * 初始闭包生成, 不包含dot
@@ -19,7 +22,7 @@ public class Enclosure {
                 //添加新的
                 lr.add(new LR1Item(pair,
                         0,
-                        Collections.singletonList(symbols.end.getValue()))
+                        Collections.singletonList(symbols.end.getValue() + "|0"))
                 );
                 break;
             }
@@ -31,14 +34,19 @@ public class Enclosure {
      * @param core : 闭包核, 需要返回整个闭包
      */
     public Enclosure(Set<LR1Item> core) {
-        this.identifier = String.valueOf(counter++);
         this.items = encloseOf(core);
+        String id = enclosures.size() == 0 ? "" : enclosures.stream()
+                .map(en -> {
+                    if (isSame(items, en.items)) {
+                        return en.identifier;
+                    }
+                    return "";
+                }).findAny()
+                .get();
+        this.identifier = id.isEmpty() ? String.valueOf(counter++) : id;
     }
 
 
-    public Enclosure() {
-        this.identifier = String.valueOf(counter++);
-    }
 
     /**
      * 当前闭包已经是epsilon闭包, 只是缺少出边
@@ -84,6 +92,7 @@ public class Enclosure {
      *
      * @param V_N:  非终结符
      * @param rules : 原文法内容
+     * @return : 包含了终结符和相对应的文法
      */
     public static Set<String> first(String V_N, List<Pair<String, String>> rules) {
         Set<String> ans = new HashSet<>();
@@ -94,7 +103,20 @@ public class Enclosure {
         } else {
             ans.add(first);
         }
-        return ans;
+        return ans.stream()
+                .map(str -> {
+                    if (str.equals(symbols.end.getValue())) {
+                        return str + "|0";
+                    }
+                    for (int index = 0; index < rules.size(); ++index) {
+                        String right = rules.get(index).second;
+                        if (right.contains(first)) {
+                            str += "|" + index;
+                            break;
+                        }
+                    }
+                    return str;
+                }).collect(Collectors.toSet());
     }
 
     /**
@@ -103,7 +125,7 @@ public class Enclosure {
      * @param V_N   : 非终结符
      * @param rules : 原文法内容
      */
-    private static Set<String> follow(String V_N, List<Pair<String, String>> rules) {
+    public static Set<String> follow(String V_N, List<Pair<String, String>> rules) {
         return new HashSet<>();
     }
 
@@ -124,7 +146,7 @@ public class Enclosure {
                 if (Rule.isV_N(nextVal)) {
                     for (Pair<String, String> rule : Rule.rules) {
                         if (rule.first.equals(nextVal)) {
-                            //获取first
+                            //获取first, 同时需要得到相应规约的是哪一个文法
                             for (String symbol : item.predictiveSymbols) {
                                 String V_N = item.restPart() + symbol; // first()
                                 List<String> predictiveSymbols =
@@ -138,7 +160,6 @@ public class Enclosure {
                 }
             }
             Set<LR1Item> tmp = new HashSet<>(core);
-
             core.addAll(newItems);
             if (isSame(core, tmp))
                 break;
@@ -147,6 +168,19 @@ public class Enclosure {
     }
 
 
+    public static void input(Set<Enclosure> en, Enclosure e) {
+        Enclosure tmp = null;
+        for (Enclosure target : en) {
+            if (target.equals(e)) {
+                tmp = target;
+                break;
+            }
+        }
+        tmp.outEdges = new HashMap<>(e.outEdges);
+        tmp.items = new HashSet<>(e.items);
+        en.add(tmp);
+    }
+
     private static boolean isSame(Set<LR1Item> i1, Set<LR1Item> i2) {
         if (i1.size() != i2.size()) return false;
         for (LR1Item item : i1) {
@@ -154,6 +188,7 @@ public class Enclosure {
         }
         return true;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -170,7 +205,7 @@ public class Enclosure {
 
     @Override
     public int hashCode() {
-        return identifier.hashCode() + this.items.stream()
+        return this.items.stream()
                 .map(LR1Item::hashCode)
                 .reduce(Integer::sum)
                 .get();

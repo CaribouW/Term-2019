@@ -6,9 +6,11 @@ import java.util.*;
 
 public class Rule {
     private static List<SingleNode> rawRules = new LinkedList<>();
+    //文法
     public static List<Pair<String, String>> rules = new LinkedList<>();
     //非终结符
     private static Set<String> V_NSet = new HashSet<>();
+
 
     static class SingleNode {
         String identifier;

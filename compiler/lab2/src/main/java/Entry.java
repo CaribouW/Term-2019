@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * The whole entry for the programme
@@ -13,6 +14,8 @@ public class Entry {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //Rule to DFA transition graph
+        Set<Enclosure> graph = Parser.rule2Enclosure(Rule.rules, "S");
 
     }
 }

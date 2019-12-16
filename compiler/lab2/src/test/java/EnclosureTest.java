@@ -39,14 +39,10 @@ public class EnclosureTest {
     @Test
     public void parserTest() {
         Rule.rules.add(new Pair<>("S'", "S"));//S' -> S
-        enclosure = new Enclosure(Rule.rules);
-        Set<Enclosure> nextEnclosures = enclosure.getNext();
-        assertEquals(1, nextEnclosures.size());
-        assertEquals(1, enclosure.outEdges.size());
         Set<Enclosure> graph = Parser.rule2Enclosure(Rule.rules, "S");
         assertEquals(4, graph.size());
-//        ParsingTable table = new ParsingTable(graph);
-//        assertEquals(graph.size(),table.size());
-//        table.printout();
+        ParsingTable table = new ParsingTable(graph);
+        assertEquals(graph.size(),table.size());
+        table.printout();
     }
 }

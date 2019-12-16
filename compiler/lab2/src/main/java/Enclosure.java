@@ -15,7 +15,7 @@ public class Enclosure {
      * @param core : 闭包的core
      */
     public Enclosure(List<Pair<String, String>> core) {
-        this.identifier = String.valueOf(counter++);
+        this.identifier = String.valueOf(counter);
         Set<LR1Item> lr = new HashSet<>();
         for (Pair<String, String> pair : core) {
             if (pair.first.equals(symbols.zeroGen.getValue())) {//S'
@@ -27,7 +27,7 @@ public class Enclosure {
                 break;
             }
         }
-        this.items = encloseOf(lr);
+        this.items = lr;
     }
 
     /**
@@ -35,27 +35,11 @@ public class Enclosure {
      */
     public Enclosure(Set<LR1Item> core) {
         this.items = encloseOf(core);
-        String id = enclosures.size() == 0 ? "" : enclosures.stream()
-                .map(en -> {
-                    if (isSame(items, en.items)) {
-                        return en.identifier;
-                    }
-                    return "";
-                }).findAny()
-                .get();
-        this.identifier = id.isEmpty() ? String.valueOf(counter++) : id;
+        this.identifier = String.valueOf(counter++);
     }
 
 
-
-    /**
-     * 当前闭包已经是epsilon闭包, 只是缺少出边
-     * 当前闭包,填充edges出边
-     *
-     * @return : 出边的所有闭包集合
-     */
-    public Set<Enclosure> getNext() {
-        Set<Enclosure> ans = new HashSet<>();
+    public void getNext() {
         Map<String, Set<LR1Item>> edge2RuleMap = new HashMap<>();        //一条边引出的LR(1)项映射
         for (LR1Item item : items) {
             //对于dot合法的LR(1)项, 求出下一个闭包的core
@@ -78,11 +62,48 @@ public class Enclosure {
         //对于每一条边发出的 LR (1) 项目集合
         for (String edgeName : edge2RuleMap.keySet()) {
             Set<LR1Item> lr1Items = edge2RuleMap.get(edgeName);
-            Enclosure nextE = new Enclosure(lr1Items);
+            lr1Items = encloseOf(lr1Items);
+            Set<LR1Item> finalLr1Items = lr1Items;
+            assert enclosures.size() > 0;
+            Enclosure nextE = enclosures.stream()
+                    .filter(enclosure -> isSame(finalLr1Items, enclosure.items)).findAny().get();
             //添加出边
             outEdges.put(edgeName, nextE.identifier);
-            //加入结果
-            ans.add(nextE);
+        }
+    }
+
+    /**
+     * 当前闭包已经是epsilon闭包, 只是缺少出边
+     * 当前闭包,填充edges出边
+     *
+     * @return : 出边的所有闭包集合
+     */
+    public static Set<Set<LR1Item>> getNext(Set<LR1Item> items) {
+        Set<Set<LR1Item>> ans = new HashSet<>();
+        Map<String, Set<LR1Item>> edge2RuleMap = new HashMap<>();        //一条边引出的LR(1)项映射
+        for (LR1Item item : items) {
+            //对于dot合法的LR(1)项, 求出下一个闭包的core
+            if (!item.isDotEnd()) {
+                //获取边
+                String edgeName = item.getPointValue();
+                //产生下一个
+                LR1Item single = new LR1Item(item.rule,
+                        item.dotIndex + 1,
+                        item.predictiveSymbols);
+                if (!edge2RuleMap.containsKey(edgeName)) {
+                    edge2RuleMap.put(edgeName, Collections.singleton(single));
+                } else {
+                    Set<LR1Item> rs = new HashSet<>(edge2RuleMap.get(edgeName));
+                    rs.add(single);
+                    edge2RuleMap.put(edgeName, rs);
+                }
+            }
+        }
+        //对于每一条边发出的 LR (1) 项目集合
+        for (String edgeName : edge2RuleMap.keySet()) {
+            Set<LR1Item> lr1Items = edge2RuleMap.get(edgeName);
+            //添加出边
+            ans.add(lr1Items);
         }
         return ans;
     }
@@ -135,7 +156,7 @@ public class Enclosure {
      * @param core : 核
      * @return : epsilon 闭包
      */
-    private static Set<LR1Item> encloseOf(Set<LR1Item> core) {
+    public static Set<LR1Item> encloseOf(Set<LR1Item> core) {
         while (true) {
             Set<LR1Item> newItems = new HashSet<>();
             for (LR1Item item : core) {
@@ -181,7 +202,7 @@ public class Enclosure {
         en.add(tmp);
     }
 
-    private static boolean isSame(Set<LR1Item> i1, Set<LR1Item> i2) {
+    public static boolean isSame(Set<LR1Item> i1, Set<LR1Item> i2) {
         if (i1.size() != i2.size()) return false;
         for (LR1Item item : i1) {
             if (!i2.contains(item)) return false;

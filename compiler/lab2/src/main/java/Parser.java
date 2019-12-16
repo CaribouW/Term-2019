@@ -1,5 +1,6 @@
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -18,42 +19,9 @@ public class Parser {
         //首先给出0号产生式
         rules.add(new Pair<>("S'", beginSymbol));
         //加入全部的内容
-        Enclosure.enclosures.add(new Enclosure(rules));
-        //作为访问限制，保证每一个闭包只做一次分析
-        Set<Enclosure> visited = new HashSet<>();
-        while (!Enclosure.enclosures.isEmpty()) {
-            Set<Enclosure> newAddList = new HashSet<>();
-            for (Enclosure e : Enclosure.enclosures) {
-                //对于没有进行转换过的闭包
-                if (!visited.contains(e)) {
-                    //状态内转换,更新e
-                    Enclosure I = inStateTransition(e);
-                    //基于 I 这个状态，进行状态间转换
-                    Set<Enclosure> nextEnclosure = betStateTransition(I);
-                    //添加新的状态 ; 如果存在的话，就是刷新这个闭包
-                    newAddList.add(I);
-                    assert nextEnclosure != null;
-                    //把所有新的闭包(还只是core的状态)加入
-                    for (Enclosure next : nextEnclosure) {
-                        if (!Enclosure.enclosures.contains(next))
-                            newAddList.add(next);
-                    }
-                    visited.add(I);
-                }
-            }
-            if (0 == newAddList.size())
-                break;
-            Enclosure.enclosures.addAll(newAddList);
-//            for (Enclosure e : newAddList) {
-//                if (Enclosure.enclosures.contains(e)) {
-//                    Enclosure.input(Enclosure.enclosures, e);
-//                } else {
-//                    Enclosure.enclosures.add(e);
-//                }
-//            }
-        }
-
-        return Enclosure.enclosures;
+        Enclosure e = new Enclosure(rules);
+        //获取闭包内容
+        return BFS(e.items);
     }
 
     /**
@@ -61,6 +29,32 @@ public class Parser {
      */
     public static void DFA2Table(Set<Enclosure> graph) {
 
+    }
+
+    private static Set<Enclosure> BFS(Set<LR1Item> start) {
+        Queue<Set<LR1Item>> queue = new LinkedList<>();
+        List<Set<LR1Item>> visited = new LinkedList<>();
+        queue.offer(start);
+        //BFS获取全部的闭包内容
+        while (!queue.isEmpty()) {
+            Set<LR1Item> top = queue.poll();
+            //首先求闭包
+            top = Enclosure.encloseOf(top);
+            if (isVisited(visited, top)) {
+                continue;
+            }
+            //进行状态间扩展
+            Set<Set<LR1Item>> itemSets = betStateTransition(top);
+            for (Set<LR1Item> set : itemSets)
+                queue.offer(set);
+            Enclosure.enclosures.add(new Enclosure(top));
+            visited.add(top);
+        }
+        //连边
+        for (Enclosure enclosure : Enclosure.enclosures) {
+            enclosure.getNext();
+        }
+        return Enclosure.enclosures;
     }
 
     /**
@@ -76,8 +70,14 @@ public class Parser {
     /**
      * 状态间转换
      */
-    public static Set<Enclosure> betStateTransition(Enclosure enclosure) {
-        return enclosure.getNext();
+    public static Set<Set<LR1Item>> betStateTransition(Set<LR1Item> items) {
+        return Enclosure.getNext(items);
     }
 
+    private static boolean isVisited(List<Set<LR1Item>> visited, Set<LR1Item> set) {
+        for (Set<LR1Item> s : visited) {
+            if (Enclosure.isSame(s, set)) return true;
+        }
+        return false;
+    }
 }

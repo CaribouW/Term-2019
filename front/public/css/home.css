@@ -5,8 +5,8 @@ body {
 
 .home-body {
     width: 80%;
-    margin: 4% auto 0;
-    margin-bottom: 10%;
+    margin: 100px auto 10%;
+    max-width: 80%;
 }
 
 .jumbotron {

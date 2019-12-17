@@ -1,0 +1,27 @@
+html,
+body {
+    background-color: #FFFFFF;
+}
+
+.home-body {
+    width: 70%;
+    margin: 0 auto;
+}
+
+.jumbotron {
+    display: flex;
+    margin-top: 90px;
+    position: relative;
+}
+
+.jumbotron > * {
+    width: 100%;
+    height: 100%;
+}
+
+.home-content {
+}
+
+.home-content > .row {
+
+}

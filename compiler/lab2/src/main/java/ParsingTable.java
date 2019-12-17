@@ -1,3 +1,5 @@
+import exceptions.RuleAmbiguousException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +10,7 @@ public class ParsingTable {
         Map<String, String> actions;
         Map<String, String> gotos;
 
-        public TableRow(Enclosure enclosure) {
+        public TableRow(Enclosure enclosure) throws RuleAmbiguousException {
             actions = new HashMap<>();
             gotos = new HashMap<>();
             for (String edge : enclosure.outEdges.keySet()) {
@@ -24,6 +26,9 @@ public class ParsingTable {
                 //可以规约
                 if (item.isDotEnd()) {
                     for (String symbol : item.predictiveSymbols) {
+                        if (gotos.containsKey(symbol)) {
+                            throw new RuleAmbiguousException("rule ambiguous!");
+                        }
                         int index = getRuleIndex(item.rule, Rule.rules);
                         assert index >= 0;
                         actions.put(symbol, Rule.zeroIndex == index ? symbols.accept.getValue() : "r" + index);
@@ -44,24 +49,9 @@ public class ParsingTable {
 
     private Map<String, TableRow> table = new HashMap<>();
 
-    public ParsingTable(Set<Enclosure> graph) {
+    public ParsingTable(Set<Enclosure> graph) throws RuleAmbiguousException {
         for (Enclosure enclosure : graph) {
             table.put(enclosure.identifier, new TableRow(enclosure));
-        }
-    }
-
-    public void printout() {
-        for (String state : table.keySet()) {
-            System.out.println(String.format("state:%s", state));
-            TableRow row = table.get(state);
-            System.out.println("action:");
-            for (String actionK : row.actions.keySet()) {
-                System.out.println(String.format("%s:%s\t", actionK, row.actions.get(actionK)));
-            }
-            System.out.println("goto");
-            for (String gotoK : row.gotos.keySet()) {
-                System.out.println(String.format("%s:%s\t", gotoK, row.gotos.get(gotoK)));
-            }
         }
     }
 

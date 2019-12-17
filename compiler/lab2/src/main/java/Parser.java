@@ -1,3 +1,6 @@
+import exceptions.InvalidInputException;
+import exceptions.RuleAmbiguousException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -5,6 +8,8 @@ import java.util.stream.Collectors;
  * The parser to generate the final parser table
  */
 public class Parser {
+    private static final String lineSep = "=============================================";
+
     /**
      * 根据文法定义，生成DFA闭包
      *
@@ -27,7 +32,7 @@ public class Parser {
      *
      * @return : 返回的parsing table
      */
-    public static ParsingTable DFA2Table(Set<Enclosure> graph) {
+    public static ParsingTable DFA2Table(Set<Enclosure> graph) throws RuleAmbiguousException {
         return new ParsingTable(graph);
     }
 
@@ -36,7 +41,9 @@ public class Parser {
      *
      * @param input : 输入文本内容
      */
-    public static void parsingInput(ParsingTable table, String input) {
+    public static void parsingInput(ParsingTable table, String input)
+            throws InvalidInputException {
+        String tmp = input;
         List<Pair<String, String>> reductionSeq = new LinkedList<>();
         input += symbols.end.getValue();            //添加 $ 终止符号
         Stack<String> stateStack = new Stack<>();   //状态栈
@@ -70,14 +77,14 @@ public class Parser {
                 stateStack.push(table.query(stateStack.peek(), symbolStack.peek(), false));
             } else {
                 //error
-                assert false;
+                throw new InvalidInputException(String.format("Invalid input 【%s】\n%s", tmp, lineSep));
             }
         }
-
+        System.out.println(String.format("The parsing process of 【%s】 are as blow:", tmp));
         for (Pair<String, String> pair : reductionSeq) {
             System.out.println(String.format("%s->%s", pair.first, pair.second));
         }
-
+        System.out.println(lineSep);
     }
 
     private static Set<Enclosure> BFS(Set<LR1Item> start) {
@@ -112,7 +119,7 @@ public class Parser {
 
     /**
      * 状态内部转换，其实就是根据core来求整个闭包
-     *
+     *x33
      * @param core : 闭包核
      * @return : 整个闭包内容
      */

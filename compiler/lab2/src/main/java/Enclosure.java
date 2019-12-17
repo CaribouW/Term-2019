@@ -37,7 +37,9 @@ public class Enclosure {
         this.identifier = String.valueOf(counter++);
     }
 
-
+    /**
+     * 根据当前闭包，扩展边edges
+     */
     public void getNext() {
         Map<String, Set<LR1Item>> edge2RuleMap = new HashMap<>();        //一条边引出的LR(1)项映射
         for (LR1Item item : items) {
@@ -174,6 +176,9 @@ public class Enclosure {
         return core;
     }
 
+    /**
+     * 判定两个LR(1)集合是否完全相同
+     */
     public static boolean isSame(Set<LR1Item> i1, Set<LR1Item> i2) {
         if (i1.size() != i2.size()) return false;
         for (LR1Item item : i1) {

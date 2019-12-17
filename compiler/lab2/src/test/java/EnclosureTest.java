@@ -29,6 +29,6 @@ public class EnclosureTest {
         Set<Enclosure> target = Enclosure.enclosures;
         assertEquals(Enclosure.enclosures.size(), graph.size());
         ParsingTable table = Parser.DFA2Table(graph);
-        Parser.parsingInput(table, "i+i");
+        Parser.parsingInput(table, "j-j;");
     }
 }

@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ enum symbols {
     }
 }
 
-public class LR1Item {
+public class LR1Item implements Serializable {
     public Pair<String, String> rule;   //文法映射
     public int dotIndex;                //点的位置
     public List<String> predictiveSymbols;//预测符

@@ -1,0 +1,75 @@
+The parsing process of 【i+i;】 are as blow:
+A->i
+A->i
+A->A+A
+S->A
+S->S;
+
+The parsing tree of 【i+i;】 is as blow:
+---【S】
+	---【;】
+	---【S】
+		---【A】
+			---【A】
+				---【i】
+			---【+】
+			---【A】
+				---【i】
+=============================================
+Invalid input 【i*j;】
+=============================================
+The parsing process of 【j-j;】 are as blow:
+B->j
+B->j
+B->B-B
+S->B
+S->S;
+
+The parsing tree of 【j-j;】 is as blow:
+---【S】
+	---【;】
+	---【S】
+		---【B】
+			---【B】
+				---【j】
+			---【-】
+			---【B】
+				---【j】
+=============================================
+The parsing process of 【k*k;】 are as blow:
+C->k
+C->k
+C->C*C
+S->C
+S->S;
+
+The parsing tree of 【k*k;】 is as blow:
+---【S】
+	---【;】
+	---【S】
+		---【C】
+			---【C】
+				---【k】
+			---【*】
+			---【C】
+				---【k】
+=============================================
+Invalid input 【i+k】
+=============================================
+The parsing process of 【i+i】 are as blow:
+A->i
+A->i
+A->A+A
+S->A
+
+The parsing tree of 【i+i】 is as blow:
+---【S】
+	---【A】
+		---【A】
+			---【i】
+		---【+】
+		---【A】
+			---【i】
+=============================================
+Invalid input 【i-j-k】
+=============================================

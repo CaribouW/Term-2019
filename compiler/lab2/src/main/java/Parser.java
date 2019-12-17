@@ -84,6 +84,13 @@ public class Parser {
         for (Pair<String, String> pair : reductionSeq) {
             System.out.println(String.format("%s->%s", pair.first, pair.second));
         }
+        //打印parsing tree
+        System.out.println(String.format("\nThe parsing tree of 【%s】 is as blow:", tmp));
+        ParsingTree.Node root = ParsingTree.generateTree(reductionSeq);
+        ParsingTree.Node nullNode = new ParsingTree.Node();
+        nullNode.next = Collections.singletonList(root);
+        ParsingTree.displaytree(nullNode, 0);
+        //end
         System.out.println(lineSep);
     }
 
@@ -119,7 +126,7 @@ public class Parser {
 
     /**
      * 状态内部转换，其实就是根据core来求整个闭包
-     *x33
+     *
      * @param core : 闭包核
      * @return : 整个闭包内容
      */

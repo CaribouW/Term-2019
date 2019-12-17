@@ -4,13 +4,13 @@ body {
 }
 
 .home-body {
-    width: 70%;
-    margin: 0 auto;
+    width: 80%;
+    margin: 4% auto 0;
+    margin-bottom: 10%;
 }
 
 .jumbotron {
     display: flex;
-    margin-top: 90px;
     position: relative;
 }
 
@@ -19,9 +19,6 @@ body {
     height: 100%;
 }
 
-.home-content {
-}
-
-.home-content > .row {
+.load-more__btn {
 
 }

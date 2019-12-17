@@ -8,7 +8,7 @@ const session = require("express-session"); //会话
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const captchaRouter = require('./routes/captcha');
-
+const resourceRouter = require('./routes/resource');
 const app = express();
 
 //port
@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/captcha', captchaRouter);
-
+app.use('/resources', resourceRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

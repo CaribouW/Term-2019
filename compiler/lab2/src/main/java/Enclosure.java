@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Enclosure {
     public static Set<Enclosure> enclosures = new HashSet<>();
@@ -22,7 +21,7 @@ public class Enclosure {
                 //添加新的
                 lr.add(new LR1Item(pair,
                         0,
-                        Collections.singletonList(symbols.end.getValue() + "|0"))
+                        Collections.singletonList(symbols.end.getValue()))
                 );
                 break;
             }
@@ -124,20 +123,7 @@ public class Enclosure {
         } else {
             ans.add(first);
         }
-        return ans.stream()
-                .map(str -> {
-                    if (str.equals(symbols.end.getValue())) {
-                        return str + "|0";
-                    }
-                    for (int index = 0; index < rules.size(); ++index) {
-                        String right = rules.get(index).second;
-                        if (right.contains(first)) {
-                            str += "|" + index;
-                            break;
-                        }
-                    }
-                    return str;
-                }).collect(Collectors.toSet());
+        return ans;
     }
 
     /**
@@ -186,20 +172,6 @@ public class Enclosure {
                 break;
         }
         return core;
-    }
-
-
-    public static void input(Set<Enclosure> en, Enclosure e) {
-        Enclosure tmp = null;
-        for (Enclosure target : en) {
-            if (target.equals(e)) {
-                tmp = target;
-                break;
-            }
-        }
-        tmp.outEdges = new HashMap<>(e.outEdges);
-        tmp.items = new HashSet<>(e.items);
-        en.add(tmp);
     }
 
     public static boolean isSame(Set<LR1Item> i1, Set<LR1Item> i2) {

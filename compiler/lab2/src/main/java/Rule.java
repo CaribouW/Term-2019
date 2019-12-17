@@ -8,6 +8,7 @@ public class Rule {
     private static List<SingleNode> rawRules = new LinkedList<>();
     //文法
     public static List<Pair<String, String>> rules = new LinkedList<>();
+    public static int zeroIndex = 0;
     //非终结符
     private static Set<String> V_NSet = new HashSet<>();
 

@@ -1,9 +1,10 @@
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class ParsingTable {
-    private class TableRow {
+    private static class TableRow {
         Map<String, String> actions;
         Map<String, String> gotos;
 
@@ -23,15 +24,21 @@ public class ParsingTable {
                 //可以规约
                 if (item.isDotEnd()) {
                     for (String symbol : item.predictiveSymbols) {
-                        //conflict!
-                        String[] content = symbol.split("\\|");
-                        if (content[0].equals(symbols.end.getValue()) &&
-                                item.rule.first.equals(symbols.zeroGen.getValue())) {
-                            actions.put(content[0], symbols.accept.getValue());
-                        } else actions.put(content[0], "r" + content[1]);
+                        int index = getRuleIndex(item.rule, Rule.rules);
+                        assert index >= 0;
+                        actions.put(symbol, Rule.zeroIndex == index ? symbols.accept.getValue() : "r" + index);
                     }
                 }
             }
+        }
+
+        private static int getRuleIndex(Pair<String, String> rule, List<Pair<String, String>> rules) {
+            int ans = 0;
+            for (; ans < rules.size(); ++ans) {
+                if (rule.equals(rules.get(ans)))
+                    return ans;
+            }
+            return -1;
         }
     }
 
@@ -60,5 +67,19 @@ public class ParsingTable {
 
     public int size() {
         return this.table.size();
+    }
+
+    /**
+     * Query the table element
+     *
+     * @param state    : 状态
+     * @param symbol   : 符号
+     * @param isAction : 是否是action查询
+     * @return : 如果查找的到就返回，不存在就返回 ""
+     */
+    public String query(String state, String symbol, boolean isAction) {
+        if (!table.containsKey(state)) return "";
+        return isAction ? table.get(state).actions.getOrDefault(symbol, "")
+                : table.get(state).gotos.getOrDefault(symbol, "");
     }
 }

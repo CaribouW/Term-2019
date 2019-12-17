@@ -53,7 +53,11 @@ public class LR1Item {
 
     @Override
     public int hashCode() {
-        return rule.hashCode() + dotIndex + predictiveSymbols.stream().map(sy -> sy.hashCode()).reduce((a, b) -> a + b).get();
+        return rule.hashCode() + dotIndex + predictiveSymbols
+                .stream()
+                .map(String::hashCode)
+                .reduce(Integer::sum)
+                .get();
     }
 
     public String getPointValue() {

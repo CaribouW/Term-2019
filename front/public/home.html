@@ -7,6 +7,7 @@
     <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="js/lazy_load.js"></script>
     <link type="text/css" rel="stylesheet" href="css/home.css">
     <link type="text/css" rel="stylesheet" href="css/header.css">
 </head>
@@ -54,31 +55,27 @@
 <div class="tab-content">
     <div class="tab-pane active" id="home">
         <div class="home-body">
-<!--            <div class="jumbotron">-->
-<!--                <div class="embed-responsive embed-responsive-16by9 video">-->
-<!--                    <iframe class="embed-responsive-item"-->
-<!--                            src="https://www.youtube.com/embed/v64KOxKVLVg"-->
-<!--                            allowfullscreen></iframe>-->
-<!--                </div>-->
-<!--            </div>-->
             <div class="home-content list">
                 <div>
                     <div class="row">
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/1.jpg"
+                                <img data-original="resources/1.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/2.jpg"
+                                <img data-original="resources/2.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/3.jpg"
+                                <img data-original="resources/3.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
@@ -87,19 +84,22 @@
                     <div class="row">
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/4.jpg"
+                                <img data-original="resources/4.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/5.jpg"
+                                <img data-original="resources/5.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/6.jpg"
+                                <img data-original="resources/6.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
@@ -108,58 +108,44 @@
                     <div class="row">
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/9.jpg"
+                                <img data-original="resources/9.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/7.jpg"
+                                <img data-original="resources/7.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
                         <div class="col-sm-8 col-md-4">
                             <a href="#" class="thumbnail">
-                                <img src="resources/8.jpg"
+                                <img data-original="resources/8.jpg"
+                                     width="320" height="240"
                                      alt="通用的占位符缩略图">
                             </a>
                         </div>
                         <div class="row">
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/10.jpg"
+                                    <img data-original="resources/10.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/11.png"
+                                    <img data-original="resources/11.png"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/12.jpg"
-                                         alt="通用的占位符缩略图">
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-8 col-md-4">
-                                <a href="#" class="thumbnail">
-                                    <img src="resources/13.jpg"
-                                         alt="通用的占位符缩略图">
-                                </a>
-                            </div>
-                            <div class="col-sm-8 col-md-4">
-                                <a href="#" class="thumbnail">
-                                    <img src="resources/14.jpg"
-                                         alt="通用的占位符缩略图">
-                                </a>
-                            </div>
-                            <div class="col-sm-8 col-md-4">
-                                <a href="#" class="thumbnail">
-                                    <img src="resources/15.jpg"
+                                    <img data-original="resources/12.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
@@ -167,39 +153,22 @@
                         <div class="row">
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/16.jpg"
+                                    <img data-original="resources/13.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/17.jpg"
+                                    <img data-original="resources/14.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/18.jpg"
-                                         alt="通用的占位符缩略图">
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-8 col-md-4">
-                                <a href="#" class="thumbnail">
-                                    <img src="resources/19.jpg"
-                                         alt="通用的占位符缩略图">
-                                </a>
-                            </div>
-                            <div class="col-sm-8 col-md-4">
-                                <a href="#" class="thumbnail">
-                                    <img src="resources/20.jpg"
-                                         alt="通用的占位符缩略图">
-                                </a>
-                            </div>
-                            <div class="col-sm-8 col-md-4">
-                                <a href="#" class="thumbnail">
-                                    <img src="resources/21.jpg"
+                                    <img data-original="resources/15.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
@@ -207,19 +176,68 @@
                         <div class="row">
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/22.jpg"
+                                    <img data-original="resources/16.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/23.jpg"
+                                    <img data-original="resources/17.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
                             <div class="col-sm-8 col-md-4">
                                 <a href="#" class="thumbnail">
-                                    <img src="resources/24.jpg"
+                                    <img data-original="resources/18.jpg"
+                                         width="320" height="240"
+                                         alt="通用的占位符缩略图">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8 col-md-4">
+                                <a href="#" class="thumbnail">
+                                    <img data-original="resources/19.jpg"
+                                         width="320" height="240"
+                                         alt="通用的占位符缩略图">
+                                </a>
+                            </div>
+                            <div class="col-sm-8 col-md-4">
+                                <a href="#" class="thumbnail">
+                                    <img data-original="resources/20.jpg"
+                                         width="320" height="240"
+                                         alt="通用的占位符缩略图">
+                                </a>
+                            </div>
+                            <div class="col-sm-8 col-md-4">
+                                <a href="#" class="thumbnail">
+                                    <img data-original="resources/21.jpg"
+                                         width="320" height="240"
+                                         alt="通用的占位符缩略图">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8 col-md-4">
+                                <a href="#" class="thumbnail">
+                                    <img data-original="resources/22.jpg"
+                                         width="320" height="240"
+                                         alt="通用的占位符缩略图">
+                                </a>
+                            </div>
+                            <div class="col-sm-8 col-md-4">
+                                <a href="#" class="thumbnail">
+                                    <img data-original="resources/23.jpg"
+                                         width="320" height="240"
+                                         alt="通用的占位符缩略图">
+                                </a>
+                            </div>
+                            <div class="col-sm-8 col-md-4">
+                                <a href="#" class="thumbnail">
+                                    <img data-original="resources/24.jpg"
+                                         width="320" height="240"
                                          alt="通用的占位符缩略图">
                                 </a>
                             </div>
@@ -336,6 +354,9 @@
     //     item: 'div.row',
     //     count: 1
     // });
+    $(".row img").lazyload({
+        effect : "fadeIn"
+    });
     $('#header-tab a').click(function (e) {
         e.preventDefault();
         $(this).tab('show');

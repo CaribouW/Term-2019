@@ -5,12 +5,14 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require("express-session"); //会话
+const compression = require('compression');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const captchaRouter = require('./routes/captcha');
 const resourceRouter = require('./routes/resource');
 const app = express();
 
+app.use(compression());
 //port
 app.listen(8000);
 app.use(cookieParser());

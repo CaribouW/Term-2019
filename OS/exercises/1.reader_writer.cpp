@@ -1,13 +1,4 @@
-struct semaphore
-{
-    int value;
-    semaphore(int value)
-    {
-        this->value = value;
-    }
-};
-extern void P(semaphore *);
-extern void V(semaphore *);
+#include "semaphore.h"
 
 //读者写者问题
 #define WriterFirst
@@ -76,7 +67,7 @@ void process_reader()
 {
     while (1)
     {
-        P(&queue);
+        P(&queue);              //读者需要等待的队列, 必须在写者个数是0才可以进入
         P(&r_counter_mutex);
         if (0 == reader_count)
             P(&rwmutex);
